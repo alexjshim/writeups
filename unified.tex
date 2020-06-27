@@ -212,7 +212,7 @@ so the functional form of our Boltzmann machine motivates us to treat $\eta = w_
 
 \begin{equation}
   \begin{split}
-    \eta = w_{i,j} X_j + u_i$ \\
+    \eta = w_{i,j} X_j + u_i \\
     P(Y \vert \eta) = E_{Y \sim P(Y \vert \eta)} \left[ Y \right] = \sigma (Y)
   \end{split}
   \label{<++>}
@@ -364,6 +364,7 @@ This is called the proximal operator:
   \begin{split}
     prox_g(x) = \arg \min_{u} g(u) + \frac{1}{2} \lVert x - u \rVert ^2\\
     \theta^{k+1} := prox_{t_k g} \left( \theta^k - t_k \nabla_{\theta} f(\theta^k) \right)
+  \end{split}
   \label{<++>}
 \end{equation}<++>
 
