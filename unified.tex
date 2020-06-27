@@ -1,0 +1,379 @@
+%        File: unified.tex
+%     Created: Wed Jun 24 02:00 PM 2020 P
+% Last Change: Wed Jun 24 02:00 PM 2020 P
+%
+\documentclass[a4paper]{article}
+\usepackage{amsmath, amssymb}
+
+\begin{document}
+
+\section{Introduction}<++>
+	Deep neural networks have repeatedly surpassed state of the art benchmarks in various use cases, and they have been deployed in many commercial and industry applications. 
+The surge in demand for deep learning has motivated the development of neural network libraries such as tensorflow and pytorch as well as greater abstractions such as keras, which allow more black box model training and development. 
+The associated demand for data scientists and machine learning engineers have led to ``transplants'' from other fields migrating into machine learning, and much of the knowledge of deep learning has been distilled into the composition of functional, accessible components. 
+
+	In contrast, the question of what deep learning models are actually doing is unclear and perhaps ill-posed.
+We seek to present partial answers presented from the fields of statistics, probabilistic graphical models, optimization, and operator theory. 
+Many of these connections are well-known in their respective fields or at least are heavily implicit in their formulations.
+We are especially interested in the limitations of these interpretations and their intersections, especially where a secondary interpretation offers insight beyond the scope of a more restrictive interpretation.
+
+	We begin by describing the exponential family and special properties of the regression of residuals for learning exponential family models, thereby fully describing the output layer of most machine learning models. 
+Second, we describe connect a few very simple probabilistic graphical models with well-known machine learning models, providing an interpretation of pairwise weights for intermediate deep learning layers. 
+Third, we explore the optimization perspective of machine learning, starting with the probabilistic branch of optimization and then generalizing past by exploring other operatorswhich provide an interpretation of the rectified linear unit. 
+Finally, we transition into an operator perspective and the deep equilibrium model perpsective of deep learning and tie it into the particle perspective of our layers acting as operators, transforming our spaces.
+
+\section{Exponential Families}<++>
+	Exponential families are deeply intertwined into the concept of entropy and energy and can act as a probabilistic building block for density estimation. 
+In fact, both regression and classification are special cases of target distributions defined by a specific exponential family. 
+Moreover, exponential families provide a more specific definition of residuals, and gradient descent of exponential family losses can be shown to directly update the natural parameters.
+	The form for exponential family of distribution of distributions is derived by the Pitman-Koopman-Dermois Theorem. The proof by Koopman built off Fisher's ideas about sufficient statistics to express a family of distributions which can be defined by the sufficient statistic, assuming certain other restrictions.
+
+\begin{equation}
+  \begin{split}
+    P \left(x \vert \eta \right) = g(\eta) h(x) \exp\left\{  \left< u(x), \eta \right> \right\}<++> \\
+    P \left(x \vert \eta \right) =  h(x) \exp\left\{  \left< u(x), \eta \right> - G(\eta) \right\}<++>
+   \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+where $u(x)$ is the sufficient statistic (which must be additive) for a single element, $\eta$ is the natural parameter for that sufficient statistic, $h(x)$ is an innate measure of $X$ which is completely independent of the choice of the natural parameter, 
+$g(\eta)$ is the normalization constant for the Pitman-Koopman-Dermois form, and $G(\eta)$ is an alternative form form for the normalization constant which is more consistent with thelog factor potential interpretation.
+
+We perform an equivalent derivation for both cases, with $ \frac{1}{g(\eta)} = \exp\left\{ G(\eta) \right\}$:
+
+\begin{equation}
+  \begin{split}
+    \int P \left(x \vert \eta \right) dx = \int g(\eta) h(x) \exp\left\{  \left< u(x), \eta \right> \right\} dx \\
+    1 = g(\eta) \int h(x) \exp\left\{  \left< u(x), \eta \right> \right\} dx \\
+    \frac{1}{g(\eta)} = \int h(x) \exp\left\{  \left< u(x), \eta \right> \right\} dx \\
+    \int P \left(x \vert \eta \right) dx =  \int h(x) \exp\left\{  \left< u(x), \eta \right> - G(\eta) \right\} dx \\
+    1 = \int h(x) \exp\left\{  \left< u(x), \eta \right> - G(\eta) \right\} dx \\
+    \exp \left\{ G(\eta) \right\} = \int h(x) \exp \left\{ \left< u(x), \eta \right> \right\} dx
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+One very important property relates the natural parameter to the expected sufficient statistic:
+
+\begin{equation}
+  \begin{split}
+    \exp \left\{ G(\eta) \right\} &= \int h(x) \exp \left\{ \left< u(x), \eta \right> \right\} dx \\
+    \nabla_{\eta} \exp \left\{ G(\eta) \right\} &= \frac{\int u(x) h(x) \exp \left\{ \left< u(x), \eta \right> \right\} dx}{\int h(x) \exp \left\{ \left< u(x), \eta \right> \right\} dx} \\
+    &= \frac{\int u(x) h(x) \exp \left\{ \left< u(x), \eta \right> \right\} dx}{\exp\left\{ G(\eta) \right\}}<++> \\
+    \nabla_{\eta} \exp \left\{ G(\eta) \right\} &= E_{x \sim P(x \vert \eta)} \left[ u(x) \right]<++> \\
+    \nabla_{\eta} \left[ - \log g(\eta) \right] &= E_{x \sim P(x \vert \eta)} \left[ u(x) \right]<++> \\
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+It can be proven that this is a one-to-one mapping which in one direction is known as the canonical-link function, and it has many useful properties. 
+One specific case is when we generate samples from an unknown distribution, in which case the $\eta$ that maximizes the log probability of seeing those samples would be the $\eta$ that has the same sufficient statistic (assuming that is possible):
+
+\begin{equation}
+  \begin{split}
+    \nabla_{\eta} \frac{1}{N} \sum_{n=1}^N \log P( x_n \vert \eta ) &= \frac{1}{N} \sum_{n=1}^N \left( u(x_n) - \nabla_{\eta} G(\eta) \right) <++> \\
+    &= \frac{1}{N} \sum_{n=1}^N \left( u(x_n) - E_{x \sim P(x \vert \eta)} \left[ u(x) \right] \right) \\
+  \end{split}
+  \label{}<++>
+\end{equation}
+
+\begin{equation}
+  \begin{split}
+    0 &= \frac{1}{N} \sum_{n=1}^N \left( u(x_n) - E_{x \sim P(x \vert \eta)} \left[ u(x) \right] \right) \\
+    \sum_{n=1}^N \frac{u(x_n)}{N} &=  E_{x \sim P(x \vert \eta)} \left[ u(x) \right] 
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+The first form shows that gradient descent on the log probabilities, which is the form of both regression and classification loss functions, with respect to the natural parameters is exactly the same as the difference between the sufficient statistic and the expected sufficient statistic. 
+Hence, the concept of a residual for square regression loss is generalized to residuals of sufficient statistics, and the residual can be used as a gradient update to the natural parameters. 
+This is quite remarkable, and when we consider that the samples are taken from some unknown distribution $p_{data}(x)$, we see that maximizing the negative log likelihood is the same as minimizing the cross-entropy, which is the same as minimizing the KL-divergence:
+
+\begin{equation}
+  \begin{split}
+    KL\left( p_{data}(x) \Vert p(x \vert \eta) \right) = H\left( p_{data}(x) \right) - \int p_{data}(x) \log p(x \vert \eta) dx \\
+    \min_{\eta} KL\left( p_{data}(x) \Vert p(x \vert \eta) \right) = \min_{\eta} - \int p_{data}(x) \log p(x \vert \eta) dx \\
+    \nabla_{\eta} KL\left( p_{data}(x) \Vert p(x \vert \eta) \right) = \nabla_{\eta} E_{x \sim p_{data}(x)} \left[ - \log p(x \vert \eta) \right] \\
+    = E_{x \sim p_{data}(x)} \left[ u(x_n) \right] - E_{x \sim p(x \vert \eta) } \left[ u(x) \right]
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+This is called an M-projection, and it intertwines exponential families with the concept of entropy. 
+In fact, Boltzmann's derivation of entropy is a special case with a multinoulli distribution. 
+Intuitively, this connection is sensible, since entropy acts upon log probabilities, and the form of an exponential family distribution is in exponential space.
+
+Finally, in the case of conditional models, or discriminative models, we may have some set of non-linear feature mappings for the input, and we may try to model the natural parameters as a linear combination of the features. 
+In the case of a gaussian conditional distribution, this is known as regression, and for classification (multinomial) logistic regression. 
+
+\begin{equation}
+  \begin{split}
+    \eta = \sum_j w_j \phi_j(x) \\
+    \nabla_w \log p(x \vert w) = \nabla_w \eta \nabla_{\eta} \log p(x \vert \eta) \\
+    = \begin{pmatrix} \phi_1(x) & \cdots & \phi_M(x) \end{pmatrix} \nabla_{\eta} \log p(x \vert \eta) \\
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+This is also known as a generalized linear model (GLM), with the canonical link functions defining the nonlinearities. 
+Hence, for these regression models, gradient updates for the weights can be done almost directly through the residuals.
+
+There are many more remarkable properties of exponential families, and due to those, it is preferable to try to model distributions as exponential families.
+In fact, many derivations for regression and classification can be generalized to any exponential family.
+
+\section{Probabilistic Graphical Models}<++>
+
+The properties of exponential families and their connection to KL-divergence and entropy motivates the parametrization of probabilistic graphical models (PGMs), specifically the undirected case, Markov networks.
+
+For the case of positive PGMs, that is PGMs for which the probability density/probability mass is never 0, they can be written in the form of a Gibbs distribution:
+
+\begin{equation}
+  P_{\Phi} ( \mathcal{X} ) \propto \prod_i \phi_i(C_i)
+  \label{<++>}
+\end{equation}<++>
+
+where $\mathcal{X} = \left\{ X_1, \ldots, X_N \right\}$, $i$ enumerates the set of cliques of the undirected graph, $\phi_i$ is a real-valued function called the factor potential, and $C_i = Scope[\phi_i]$.
+
+This result is known as the Hammersley-Clifford theorem, and for positive distributions it connects the concepts of global conditional independence properties with pairwise conditional independence and local, Markov blanket conditional independence.
+
+In the case of positive distributions, the Gibbs distribution can be written in terms of log factor potentials, and one parametrization called log-linear models involves linear weights along with pre-specified log factor potentials:
+
+\begin{equation}
+  P_{\Phi} (\mathcal{X}) \propto \prod_i e^{ -w_i E_i(D_i) }
+  \label{<++>}
+\end{equation}<++>
+
+where $ - \log \phi_i = w_i E_i(D_i)$, and $E_i$ are called energy functions, and these unnormalized parametrizations are called energy-based models.
+
+To discern what these distributions are and what energy is, we note that log-linear models are in fact a type of exponential family distribution, with the energy function for each scope being sufficient statistics, and the weights being the natural parameters. 
+This means that once we define the energy functions, the interpretation of the energy functions is the distribution that minimizes KL divergence (maximizes entropy) while matching expected energies (expected sufficient statistics).
+
+In the case of a single clique potential/energy function for the entire model, the associated exponential family model is known as the Boltzmann distribution. 
+In this specific case, we see that the expected energy is the scaled entropy of the model, up to a term involving the normalization constant:
+
+\begin{equation}
+  \begin{split}
+    P_{E, \eta} (\mathcal{X}) \propto e^{- E(\mathcal{X}) \eta} \\
+    H\left( P_{E, \eta} (\mathcal{X}) \right) &= - \eta \int E(\mathcal{X}) P_{E, \eta} (\mathcal{X}) + G(\eta) \\
+    &= -\eta E_{ x \sim P_{E, \eta} (\mathcal{X}) } \left[ E(\mathcal{X}) \right] + G(\eta) \\
+    \frac{1}{\eta} H\left( P_{E, \eta} (\mathcal{X})  \right) &= E_{ x \sim P_{E, \eta} (\mathcal{X}) } \left[ E(\mathcal{X}) \right] + \frac{G(\eta)}{\eta} \\
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+In the case of thermodynamics, they use $\frac{1}{T}$ or $\frac{1}{kT}$ instead of $\eta$, and they call it the temperature. 
+If we take the expectation of the log of the unnormalized probability distribution, $ \tilde{P}_{E, \eta} (\mathcal{X}) = e^{- E(\mathcal{X}) \eta} $, we can ignore the normalization factor, and we get the form of Helmholtz free energy, which motivates the energy functional that is optimized in in variational inference and other PGM inference and learning algorithms. 
+
+\subsection{Machine learning PGMs}<++>
+
+It turns out even very simple Markov network parametrizations can be very good approximations to useful, real world cases. 
+The simplest log factor potentials would involve polynomials of the scope variables. 
+Somewhat independently, it is preferable to have clique potentials with a small number of scope variables due to the exponential complexity of marginalization, with respect to the number of variables. 
+For that reason, let us mostly consider the case of factor potentials involving two variables, an edge, or a single variable, a vertex:
+
+\begin{equation}
+  \begin{split}
+    P_{\Phi}( \mathcal{X} ) \propto \exp \left\{ - \sum_{ i \sim j} w_{i,j} \left< X_i, X_j \right> - \sum_i u_i X_i \right\} \\
+    = e^{ - \mathcal{X}^{ \intercal } W \mathcal{X} - U^{\intercal} \mathcal{X} }
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+where in the equation we have replaced the quadratic coefficients with a single weight matrix, and the linear coefficients with a single vector. 
+
+This is known as the Ising model, in the specific case where all the variables are discrete variables of values $+1$ or $-1$, and it is the model for electron spins.
+
+In the more general case where variables may take on values of $\left\{ 0,1 \right\}$ or perhaps continuous values, this is called the Boltzmann machine.
+
+When the PGM can be divided into a bipartite graph, this is called a Restricted Boltzmann Machine, and when both sets of variables have the same size, the weight matrix is an $N \times N$ matrix.
+
+<++>
+Placeholder, I can't justify that it will be equivalent to a Markov network. 
+
+For a Boltzmann machine, let's assume the variable $Y_i \in \left\{ 0, 1 \right\}$ is a bernoulli variable, $X_j$ are other nodes in $\mathcal{X}$, and $Nb_{Y_i}$ is the Markov blanket, that is the undirected neighbors of $Y_i$. 
+If we isolate the terms in the Boltzmann machine to the ones involving $Y_i$, we end up with
+
+\begin{equation}
+  \begin{split}
+    P_{\Phi}(Y_i, Y_i^{-}) \propto \exp\left\{ \sum_{j \in Nb_{Y_i}} w_{i,j} \left< Y_i, X_j \right> + u_i Y_i \right\} \\
+    = \exp \left\{ Y_i \sum_{j \in Nb_{Y_i}} \left( w_{i,j} X_j + u_i\ \right) \right\}
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+The exponential family form of a Bernoulli variable is
+
+\begin{equation}
+  P( Y \vert \eta ) = e^{Y \eta - G(\eta)}
+  \label{<++>}
+\end{equation}<++>
+
+so the functional form of our Boltzmann machine motivates us to treat $\eta = w_{i,j} X_j + u_i$ and assume that is the conditional distribution for $Y_i \vert Nb_{Y_i}$:
+
+\begin{equation}
+  \begin{split}
+    \eta = w_{i,j} X_j + u_i$ \\
+    P(Y \vert \eta) = E_{Y \sim P(Y \vert \eta)} \left[ Y \right] = \sigma (Y)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+Notably, linear combination of other input is functional form of a feed-forward neural network. 
+A caveat is that we have ignored all factors involving $X_j$, so technically we would have to pass messages through $X_j$, which would involve passing messages from the rest of the network. 
+
+Comparatively, a feed-forward neural network is a Bayesian discriminative model, with an unspecified distribution for the input distribution. 
+We have to make a stronger assumption that the forward weights define a conditional probability as above. 
+The more formal definition we define a conditional random field from a previous layer to the next layer using a Boltzmann machine, with the first layer being the input nodes.
+
+\begin{equation}
+  \begin{split}
+    H^0 = P_{data}(X) \\
+    P( H^{l+1} \vert H^l ) = \frac{1}{Z(H^l} RBM(H^l, H^{l+1}) \\
+    H^L = Y
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+Since a conditional random field factors out any potentials involving the input,we do not have to worry about the previous layer's messages. 
+We have had to make an additional assumption that we can define the conditional probability of the current layer, $H^l$, given the previous layer, $H^{l-1}$, using a CRF, and this means that we have to assume that the edge potentials connecting to the following layer, $H^{l+1}$ do not contribute to the $P(H^l \vert H^{l-1}$. 
+
+One thing to note is that we are using undirected model as a network fragment ofa directed model. 
+The directed version of this network fragment is called a conditional Bayesian network, and for the bernoulli variable case, we can define what is called a logistic conditional probability distribution (logistic CPD) almost exactly as above <++>.
+
+In fact, this can be generalized to any exponential family, through a generalized linear model with the parent variables, and we can change the target distribution family by changing the nonlinearity and the range of the target variable. 
+There are a few specific assumptions about the structure we are using here worth explicitly stating: 1) The output variables for a layer are conditionally independent of each other, given the input variables, 2) the CPDs have a property called independence of causal influence, which theoretically speaking means that the information from the parents is combined in an associative (and in our case commutative as well) way, and practical speaking it means we can drop out input. 
+
+These properties are very strong, though perhaps intuitively desirable assumptions, and they somewhat fit the model for how neurons communicate with each other. 
+Specifically, we can see the strengths of these connections through the complexity of the model - we can parametrize the conditional bayesian network between two layers by $(N^l+1) \times N^{l+1}$ weights, whereas for unrestricted Bernoulli distributions, we would need to define a separate conditional probability for every conditional outcome, for a complexity of $\left( 2^{N^{l}} -1 \right)^{2^{N^{l+1}}} = \mathcal{O} \left( 2^{N^l N^{l+1}} \right) $  
+Intuitively, when we combine information about the conditioning variable outcomes in this additive way, the symmetries of addition are compressing information and we are reducing the complexity.
+
+Since neural networks with sigmoid non-linearities can be written in this form and transformers are using multinomial logistic CPDs to define an attention variable, we finally have an interpretation of what the layers of a neural network are. 
+
+
+A specific case of the conditional Bayesian network is a conditional linear Gaussian, where we define the conditional probilities through linear Gaussians:
+
+\begin{equation}
+  \begin{split}
+    P(X^0) = \mathcal{N} \left( X^0 \vert \mu^0, \Sigma^0 \right) \\
+    P(X^{l+1} \vert X^l) = \mathcal{N} \left( X^{l+1} \vert W_{l,l+1} X^l + B^{l+1}, \Sigma^{l+1} \right)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+Usually we assume $\Sigma^{l+1} = \left( \sigma^{l+1} \right)^2 \mathbf{I}$. 
+The joint probability distribution from a linear Gaussian network can be solved analytically through a forward pass of message passing, and this is the same dynamic programming procedure which is used to solve for the optimal solution of model predictive control problems.
+
+So far we have defined generalized linear models using affine functions of the parent variables. 
+This has allowed us to define models by pairwise edge weights, specifically with log linear factors. 
+What would happen if we relax this condition somewhat, so we are using linear combinations of various non-linear functions? 
+It turns out that Gaussian joint probability distributions can always be described by pairwise edge-weights and variable potentials:
+
+\begin{equation}
+  \begin{split}
+    P(\mathcal{X}) = \mathcal{N}\left( \mathcal{X} \vert \mu \vert \Sigma \right) \\
+    = \exp\left\{ \left< \left( \mathcal{X}, \mathcal{X} \mathcal{X}^{\intercal} \right), \left( \Sigma^{-1} \mu -\frac{1}{2} \Sigma^{-1} \right) \right> \right\}\\
+    = \exp\left\{ - \frac{1}{2} \mathcal{X}^{\intercal} \Lambda \mathcal{X} + \mathcal{X}^{\intercal} \Lambda \mu \right\} 
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+This means that we should be able to do a parametrization of the nodes and edgesto define the PGM, even if we don't assume a linear-gaussian bayesian factorization. 
+We can also define a conditional probability distribution this way, so given $N$ input variables, $X_1,\ldots,X_N$, and $N$ output variables, $Y_1,\ldots,Y_N$, we can define a conditional random field through a mean and covariance. 
+This is the PGM for a Gaussian Process:
+
+\begin{equation}
+  P(Y \vert X) = GP\left( \mu(x), K(x,x') \right)
+  \label{<++>}
+\end{equation}<++>
+
+The benefit is that since we know the conditional joint probability distribution, we can condition on observing subsets of Y:
+
+\begin{equation}
+  P(Y_{unobs} \vert X, Y_{obs}) = \mathcal{N} \left( \mu_{unobs} + K_{unobs,obs} \Sigma_{obs,obs}^{-1} \left( Y_{obs} - \mu_{obs} \right), \Sigma_{unobs,unobs} - \Sigma_{unobs,obs} \Sigma_{obs,obs}^{-1} \Sigma_{obs,unobs} \right)
+  \label{<++>}
+\end{equation}<++>
+
+A caveat is that this is not exactly a PGM, since the edge weights are dependent on the value of the inputs, whereas with a PGM the parametrizations are independent of values. 
+But from a high level, when defining a CPD from a set of $N$ inputs to $N$ outputs, we have machine learning model where we define it through an $N \times N$ matrix representing the edge weights for an RBM, a conditional Bayesian network through a generalized linear model,  or an $N \times N$ matrix representing the covariance matrix for a Gaussian Process.
+
+\section{Optimization}<++>
+
+In our exponential families discussion, we saw that our maximum likelihood objectives is equivalent to minimizing the KL divergence, and we are minizing weights that define our parametrization for our probability distribution.
+For exponential family models, this is amounts to minimizing over the weights the expected energy of the model. 
+When we add L2 weight-regularization, it is equivalent to adding an isotropic Gaussian prior on the weights with covariance $\frac{\lambda}{C} \mathbf{I}$, where C is a multiplicative factor of the log likelihood loss that is often left out, and finding the MAP estimate for the weight. 
+In addition, PGM inference algorithms, having broken out of a discriminative modeling objective, involve optimizing a functional known as the Helmholtz free energy functional, which can be considered a relaxation of KL minimization.
+
+In fact, if we are have a GLM model with an associated exponential family distribution, our optimization objective is convex, so we are performing a convex optimization problem. 
+However, the deeper layers change it into a non-convex problem. 
+
+There are some interesting tools in convex optimization that may be of help here. 
+
+One is under certain restrictions, we can compose functions together into convex functions. 
+We can compose convex/concave functions with real-valued monotonic convex/concave into convex or concave functions, where the result depends on whether the scalar functions is nonincreasing or nondecreasing. 
+We can also do composition with vector-value component-wise monotonic functions and and guarantee convexity/concavity. 
+This is suggestively useful, since affine functions are both linear and concave, and neural networks are built with compositions of affine functions and non-linearities - though the sigmoid nonlinearity is neither convex nor concave.
+
+Another way is that we can relax the definition of convexity to quasiconvexity, which guarantees weakened properties of convexity. 
+Essentially this allows a function to become concave, but only if it is decreasing, although we have to be careful about what decreasing means in multi-dimensional spaces. 
+Practically speaking, quasiconvexity is a property about the sublevel sets being convex. 
+Moreover, many optimization algorithm proofs assume that the sublevel sets are bounded, which means that whatever loss value we are currently at, we only have to search over a bounded, convex set to find the minimum.
+In addition, composition of functions does apply to quasiconvex functions as well. This is suggestive of the ability of optimization to provide an interpretation of multi-layered networks. 
+
+Though we are able to convert PGMs into optimization objectives, we quickly find departures from this ideal in machine learning. 
+One example is the Rectified linear unit (ReLu), which on inspection does not seem to have a well-known exponential family distribution analog. 
+A second is that often additional regularization terms are added, such as smooth differentiability regularization or consistency regularization, that do not known probability distributions. 
+
+In contrast, regularization is a very well-developed theory in optimization. 
+The primary optimization objectives and each of the regularization terms become what is called a multicriterion optimization. 
+Constrained optimization is one case of multicriterion optimization, where bounds on the constraints function values define the additional criteria, and for Lagrangian optimization, the regularization constants have to be optimized as well, through the dual problem. 
+Regularization, or softly constrained problems, pre-define the regularization constants.
+
+Overall, the field of optimization has developed algorithms for optimizing the dual problem to turn a hard-constrained problem into a soft-constrained optimization problem, as well as primal-dual algorithms. 
+
+The interpretation of ReLu functions is somewhat more complicated. 
+As discussed above, we might have some hard-constraint on the space where we are optimizing over. 
+Normally, we would use gradient descent, but once we reach the constraint boundaries, our objective function has changed into something that is not differentiable. 
+One method for avoiding this non-differentiability is to project the update back into the constrained set of legal weight values, and these two steps are what is called the projected gradient method. 
+In fact, vanilla gradient descent with stepsize $t_k$ is equivalent to minimizing a quadratic model:
+
+\begin{equation}
+  \begin{split}
+    \theta^{k+1} := \arg \min_{\theta} f(\theta^k) + \left< \nabla_{\theta} f(\theta^k), \theta-\theta^k \right> + \frac{t_k}{2} \lVert \theta - \theta^k \rVert^2
+    = \theta^k - t_k \nabla_{\theta} f(\theta^k)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+If we minimize that quadratic model over a set C, we define our projection operator:
+
+\begin{equation}
+  \begin{split}
+    P_C(\theta) = \arg \min_{\theta} \delta \left( \theta \ge 0 \right) \\
+    P_C(\theta^k - t_k \nabla_{\theta} f(\theta^k)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+One interesting projection we can apply is projection to the non-negative real numbers - that is in fact the ReLu function. 
+There are useful optimization implications for this function - when dealing with Lagrange multipliers, for our inequality constraints we have to constrain our lagrange multipliers to have non-negative values. 
+
+Just as hard constraints are the analog to regularization, we can soften the hard constraints of a projection operator to regularization functions, like L1 regularization or other, possibly non-differentiable functions. 
+This is called the proximal operator:
+
+\begin{equation}
+  \begin{split}
+    prox_g(x) = \arg \min_{u} g(u) + \frac{1}{2} \lVert x - u \rVert ^2\\
+    \theta^{k+1} := prox_{t_k g} \left( \theta^k - t_k \nabla_{\theta} f(\theta^k) \right)
+  \label{<++>}
+\end{equation}<++>
+
+The use of these operators as a secondary step on top of a gradient descent step opens up a more powerful field of optimization theory and algorithms, including the fast iterative shrinking and thresholding algorithm (FISTA), of which Nesterov momentum is a special case. 
+
+From an interpretative standpoint, we can see that components in our model that involve projections and other operators may be perfectly valid as an alternative way to perform an optimization step without having to perform differentiation. 
+
+\section{Operator Theory}<++>
+
+
+\end{document}
+
+
