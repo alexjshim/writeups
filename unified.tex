@@ -303,6 +303,48 @@ For exponential family models, this is amounts to minimizing over the weights th
 When we add L2 weight-regularization, it is equivalent to adding an isotropic Gaussian prior on the weights with covariance $\frac{\lambda}{C} \mathbf{I}$, where C is a multiplicative factor of the log likelihood loss that is often left out, and finding the MAP estimate for the weight. 
 In addition, PGM inference algorithms, having broken out of a discriminative modeling objective, involve optimizing a functional known as the Helmholtz free energy functional, which can be considered a relaxation of KL minimization.
 
+\subsection{Maximum Entropy}<++>
+
+Another optimization objective, which connects particularly well with the concepts of exponential families, is the maximum entropy objective. 
+The concept has been used almost as a philosophical criterion for choosing distributions given observation, and we briefly restate it in terms of KL-divergence.
+
+Suppose we have a set of observations from our samples or statistics:
+
+\begin{equation}
+  \begin{split}
+    \bar{U}_i = \frac{1}{N} \sum_{n=1}^N U_i(x_n), \forall i \in \left\{ 1,\ldots,M \right\} \\
+    E_{ X \sim P_{Data}(x)} \left[ U_i(x) \right], \forall i \in \left\{ 1, \ldots, M \right\}
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+In the former case, we can use our samples as an estimate for expectations, so henceforth we will just treat our observed data as expectations of certain statistics. 
+
+We can now define sufficient statistics as log-linear factors for a Bolztmann distribution of those factors, which we will call a maximum entropy distribution:
+
+\begin{equation}
+  \tilde{P_{MaxEnt}(X)} = \exp \left\{ \sum_{i=1}^M w_i U_i(X) \right\}
+  \label{<++>}
+\end{equation}<++>
+
+Now suppose we try to find the I-projection of that distribution:
+
+\begin{equation}
+  \begin{split}
+    KL\left( Q(X) \Vert P_{MaxEnt}(X) \right) &= \sum_{i=1}^M \int Q(X) w_i U_i(X) dX - H\left( Q(X) \right) \\
+    &= \sum_{i=1}^M w_i E_{Q(X)} \left\{ U_i(X) \right\} - H\left( Q(X) \right) \\
+    &= \sum_{i=1}^M w_i \bar{U}_i - H\left( Q(X) \right) \\
+    \arg \min_{Q} KL\left( Q(X) \Vert P_{MaxEnt}(X) \right) &= \arg \min_{Q} - H\left( Q(X) \right) \\
+    &= \arg \max_{Q(X)} H\left( Q(X) \right)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+So the distribution which minimizes the KL divergence with Boltzmann distribution, is the distribution that maximizes entropy given those constraints of observing data. 
+The distribution that minimizes KL divergence with the Boltzmann distribution defined by the statistics is that same Boltzmann distribution, so maximizing entropy with respect to observed data is the same as minimizing KL divergence, which is consistent with our maximum likelihood formulations.
+
+\subsection{A possible perspective on layers}<++>
+
 In fact, if we are have a GLM model with an associated exponential family distribution, our optimization objective is convex, so we are performing a convex optimization problem. 
 However, the deeper layers change it into a non-convex problem. 
 
@@ -374,6 +416,198 @@ From an interpretative standpoint, we can see that components in our model that 
 
 \section{Operator Theory}<++>
 
+Optimization is a search procedure for local minima, in the probabilistic framework corresponding to maximum likelihood or maximum a priori estimates. 
+Gradient descent is the basis for most differentiable optimization procedures, but we have seen that other operators can be applied as well. 
+Generally in these cases there is a specific interpretation for choosing these operators, such as projection on to a constrained set or applying the proximal operator to a model composed of additive terms, such as regularization. 
+
+Regularization also involves differential operators on the loss function, although this does not fit well with the concept of adding a prior. 
+A second concern is that for deep neural networks, gradient operators and projected/proximal operators are vertical operators for optimization, but the layers themselves are applied ``horizontally'' and have a very different interpretation compared to the gradient operators. 
+In particular, ReLus for lagrangians as projected gradient descent in the vertical, optimization sense in weight space, whereas the ReLus for neural networks are projections in state space. 
+
+This state space operators interpretation is commonly used the Information Theory interpretation of deep learning, where the inputs and the hidden state outputs of each layer become random variables, and the layers themselves define transitions. 
+Generally it is described as a Markov chain of probability distributions, just like Markov Chain Monte Carlo and Sequential Monte Carlo:
+
+\begin{equation}
+  X^{(0)} \rightarrow X^{(1)} \rightarrow \cdots
+\end{equation}
+
+where the superscript in parentheses is the notation for the index of a temporal model.
+
+One acceptable transition is to define a mapping from $f_t: X^{(t)} \rightarrow X^{(t+1)}$:
+
+\begin{equation}
+  x^{(t+1)} := f( x^{(t)} )
+\end{equation}
+
+and this defines a deterministic transition from one probability space to another. 
+To generalize to the non-deterministic case, consider the case of a Bayesian network, where we define a conditional probability distribution $P( X_i \vert Pa_{X_i} )$, and for a Markov Chain, we could use the conditional probabilities with respect to each incoming state as a ``column'' in our transition matrix:
+
+\begin{equation}
+  \begin{split}
+    X^{(t+1)} \sim P \left( X^{(t+1)} \vert X^{(t)} \right)<++> \\
+    X^{(t+1)} = K_{t \rightarrow t+1} X^{(t)} \\
+    X^{(t+1)} = \int K(X^{(t)},X^{(t+1)}) X^{(t)} dX^{(t)}
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+where we have defined a kernel matrix for the discrete case in the second equation and a kernel function for the continuous case in the third equation.
+
+This is obviously a much more general treatment than the deterministic case, but one may wonder if this is able to encompass all methods worth considering of mapping one probability distribution to another. 
+This question will lead us into the mathematics of distribution theory (CITE <++> Schwartz).
+
+In order to lay the foundation an interpretation that will allow other operators we continue the discussion of layers acting as operators in deep learning theory. 
+In ``Can Recurrent Neural Networks Warp Time'' and Deep Equilibrium Models (Bai et al, 2019 <++> CITE) for residual networks, the neural network instead defines a change in state, assuming the probability space shares the same outcome space:
+
+\begin{equation}
+  X^{(t+1)} := X^{(t)} + \tau \circ X^{(t)}
+  \label{<++>}
+\end{equation}<++>
+
+This can then be interpreted as the discretization of a continuous time change in state:
+
+\begin{equation}
+  \frac{d}{dt} X(t) = \tau \circ X(t)
+  \label{<++>}
+\end{equation}<++>
+
+We have now define a partial differential equation over time - the discrete case is known as the difference equation:
+
+\begin{equation}
+  X^{(t+1)} - X^{(t)} = \left( \tau - \mathbf{I} \right) \circ X^{(t)}
+  \label{<++>}
+\end{equation}<++>
+
+and we have now defined the Laplacian on the right side, which has many interesting properties, one of which is a spectral graph theory proof that under certain assumptions, there are no eigenvectors/eigenfunctions with eigenvalue greater than 1, and that there is a unique non-negative eigenvector/eigenfunction with eigenvalue 1, which corresponds to the equilibrium distribution. 
+
+More importantly, we can now more generally define changes in time through a partial differential equation through an operator, and our neural network is describing a discretized version of a continuous time operator. 
+The interpretation of a layer as a differential equation expands our definition of operators from marginalizations with conditional probabilities to differential operators, which is more appropriate for differential regularization terms. 
+Moreover, while expanding the class of operators, it provides a less haphazard selection process to the choices of operators by an intuitive restriction to ones that correspond to meaningful differential equations.
+
+\begin{equation}
+  \begin{split}
+    X^{(t+1)} = \int P( X^{(t+1)} \vert X^{(t)} ) P(X^{(t)} dX^{(t)} \\
+    \frac{d}{dt}X(t) = \frac{\partial^2}{\partial x^2} X(t)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+The mathematical framework for this generalization is distribution theory (CITE <++>). 
+What we can integrate some function $g(x)$ of over a distribution of x. 
+When the distribution is probability measure with a probability density function $P(x)$, we can write our expectation as
+
+\begin{equation}
+  E_{X \sim P(x)} \left[ g(x) \right] = \int g(x) P(x) dx
+  \label{<++>}
+\end{equation}<++>
+
+We can define this as an inner product over function space of the two functions, the function of a random variable and the probability measure. 
+More generally, for each $P(x)$, we can define a linear mapping from the space of $C^{\infty}$ functions (<++> Footnote: technically smooth functions with compact support over an open subset $U$ of $X$) to the reals:
+
+\begin{equation}
+  \begin{split}
+    F_P(g) = \int g(x) P(x) dx \\
+    F: C^{\infty}(X) \rightarrow R \\
+    <F, g> := F(g)
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+Hence, probability measures are members of the dual space, that is the space of linear functionals, of the space of smooth functions. 
+The members of this dual space are referred to as distributions or generalized functions, and it is denoted $\mathcal{D}'(X)$.
+However, there are examples of linear functionals which are not probability measures. 
+
+For example, the nth order differential operator evaluated at a specific point:
+
+\begin{equation}
+  F(g) = \frac{\partial^n}{\partial x^n} g(x_0)
+  \label{<++>}
+\end{equation}<++>
+
+Distributions have various properties, but the most pertinent to us is when we can define linear mapping, $T$, from the space of distributions of one space, $\mathcal{D}'(X)$ to the space of distributions of another space, $\mathcal{D}'(Y)$.
+
+Suppose there exists a reverse mapping $T': C_c^{\infty}(Y) \rightarrow C_c^{\infty}(X)$ such that $\forall F \in \mathcal{D}'(X), g \in C_c^{\infty}(Y)$:
+
+\begin{equation}
+  \left< T F, g \right> = \left< F, T' g \right>
+  \label{<++>}
+\end{equation}<++>
+
+This intuitively similar to the concept of an adjoint, except that it is not guaranteed to exist. 
+When it is satisfied, it allows us to define the effect of an operator by the action of it's adjoint on the target function (<++>Footnote: bra-ket <f| T | g> in quantum physics).
+
+The relevance of this mathematical framework is that we have defined distributions and we can also define differential operators and conditional probabilities as linear mappings from one space of distributions to another, which is exactly what we want for differential equations, Markov Chain Monte Carlo, and Probabilistic Graphical Models:
+
+\subsection{Example: Conditional Probabilities}<++>
+
+For MCMC and Bayesian networks, we define can define mappings from one probability distribution, $P(x)$, to another distribution, $P(y)$, using a conditional probability distribution:
+
+\begin{equation}
+  P(y) = \int P(y \vert x) P(x) dx
+  \label{<++>}
+\end{equation}<++>
+
+Since distributions are linear mappings of functions to the reals, we want to define the distribution by its action on a function of the random variable, $y$:
+
+\begin{equation}
+  \begin{split}
+    E_{ y \sim P(y)} \left[ f(y) \right] &= \int P(y) f(y) dy \\
+    &= \int \int P(y \vert x) P(x) dx f(y) dy \\
+    &= \int P(x) \int P(y \vert x) f(y) dy \\
+    &= \int P(x) \int K(x,y) f(y) dy dx \\
+    &= \left< P(x), K^{\dagger}(y,x) f(y) \right>
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+where we define the kernel function $K(x,y) := P(y \vert x)$, and $K^{\dagger}$ is known as the adjoint of the kernel function. 
+Conditional probabilties are in fact just defining this continuous kernel function, and applying it as an operator is just multiplying by this kernel function and rearranging the order of integration when we calculate expectations. 
+
+This means that conditional probabilties is simply the special case of multiplying distributions by a function, akin to multiplying by a weight matrix.
+
+In the more general case where the kernel function does not correspond to a conditional distribution, we have to account for the change of measure with the change of variable formula:
+
+\begin{equation}
+  \begin{split}
+    \left< K P(x), g(y) \right> &= \int K(x,y) P(y) f(y) dy \\
+    &= \frac{1}{det(K)} \left< P(x), S^{\dagger} f(y) \right>
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+Reversible conditional probability distributions are special cases where the determinant is equal to one, and that the sense of kernels used in Gaussian processes and Reproducible Kernel Hilbert Spaces are symmetric kernels, which are a special case of detailed balance in MCMC (<++> CITE).
+
+\subsection{Differential operators}<++>
+
+When we apply conditional distributions, particularly for Monte Carlo estimates, we are not explicitly concerned with probability distribution itself. 
+Generally we are taking samples, then for each sample, sampling from the conditional probability distribution, and then using those to estimate some expectation. 
+
+However, when we apply the differential operator or are calculating entropy, we are interested in knowledge of the distribution itself beyond knowledge of the sample values. 
+This is why we cannot calculate entropy directly for a data distribution - it would require us to know the probability density at our sample points. 
+
+However, it is still possible to calculate expectations of a distribution transformed by a differential operator:
+
+\begin{equation}
+  \begin{split}
+    \left< \partial^n P(x), g(x) \right> &= \left< P(x), (-1)^{n} \partial^n g(x) \right> \\
+    &= E_{ x \sim P(x)} \left\{ (-1)^n \frac{\partial^n}{\partial x^n} g(x) \right\}<++>
+  \end{split}
+  \label{<++>}
+\end{equation}<++>
+
+(<++> FOOTNOTE, requires integration by parts and compact support forcing the integral to vanish at the boundaries). 
+
+We can construct more complicated operators by taking linear combinations of differental operators and multiplying by smooth functions, providing the form for most differential equations, and we can add stochasticity through the kernel functions through conditional probabilities of noise distributions.
+
+\subsection{Nonlinear operators}
+
+Our previous examples have all been linear operators on function space, and when we have been considering expectations, we are evaluating linear functionals through a function of a random variable. 
+
+However, there are both nonlinear functionals, such as the entropy function, and nonlinear operators, such as the ReLu operator, and neural networks usually apply a nonlinear operator at each layer. 
+Nonlinear differential equations tend to not have closed-form solutions, but can be approximated numerically, and an infinite depth resnet with the same weights can be construed as an infinite depth calculation towards the fixed point (<++>). 
+Moreover, the ReLu returns once again as being a plausible operator, like before in terms of a constraint. 
+For example, we may have a differential equation for a mechanics problem, where the object is constrained to be above a plane. 
+This equation is physically meaningful, though very difficult to solve, and often we have to pursue numeric solutions. 
 
 \end{document}
 
