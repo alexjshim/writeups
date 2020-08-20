@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+\usepackage[]{amsmath,amssymb}
+
+\newtheorem{definition}{Definition}
+
+\begin{document}
+
+From Probabilistic Graphical Models: Principles and Techniques
+
+\section{Template Variables and Template Factors}
+
+\begin{definition}[Probability Space]
+  A probability space is defined by the triplet $(\Omega,\mathcal{E},\mathcal{P})$, where $\Omega$ is the sample space of all possible outcomes, $\mathcal{E}$ is a $\sigma$-Borel algebra on $\Omega$ defining the set of measurable events, and $\mathcal{P} \colon \mathcal{E} \rightarrow R$ is a probability measure satisfying the Kolmogorov axioms.
+\end{definition}
+
+If we flipped $n$ different coins, we would be able to reuse the sample sample and event spaces.  Note that this creates an interesting distinction: if we flipped two independent, individually distributed (IID) coins, we would define the exact same probability space for each.
+However, the joint of two the probability spaces of two different IID coins would be different from the joint of the same probability space. 
+One way to resolve this is to make the outcomes of the two probability spaces different from each other, which would make the two probability spaces distinct. 
+However, this does not seem consistent with the idea of instantiating different random variables from the same template. 
+Another possibility is to link the probability spaces with the templates and template factors, but to be able to instantiate different copies of the probability spaces. 
+I am not sure which under which interpretation templates can be formally defined.
+
+We assume definitions for variables and functions.
+\begin{definition}[Variable]
+  
+\end{definition}<++>
+
+\begin{definition}[Function]
+  
+\end{definition}<++>
+
+\begin{definition}[Argument]
+  An argument is a variable input into a function, or a variable element of a tuple which is an input into a function. 
+  We denote a variable for the input, so the \emph{ assignment} of the variable must be any element of the set of possible input corresponding to the input. \\
+  Specifically, if $f \colon X_1 \times \ldots \times X_k \rightarrow Y$, $U_k$ denotes that argument correponding to the set $X_k$, and $U_k$ may be replaced with any element of $X_k$.
+\end{definition}
+
+We now restrict ourselves to a pre-specified set of input spaces, which we call classes.  Supposedly they ``mutually exclusive and exhaustive'', although mutually exclusive may allow for the sets to have intersecting elements, and there exists a unique class for every set of inputs under consideration.
+
+When the arguments correspond to a random variable, the argument may be replaced by an element of the sample space of the random variable.
+
+\begin{equation}
+  \mathcal{Q} = Q_1, \ldots, Q_k
+  \label{Classes}
+\end{equation}
+
+\begin{definition}[Attribute]
+  An attribute is a function $A \colon U_1, \ldots, U_k \rightarrow Val(A)$, where the range is some set Val(A). 
+  Each argument is a ``typed logical variable'' associated with a particular class $Q[U_i]$. \\
+  So there exists a mapping $f_A \colon: \left\{ U_i \right\}_{i=1}^{k} \rightarrow \mathcal{Q}$, and $Q[U_i] := f_A(U_i)$. 
+  The tuple $(U_1,\ldots,U_k$ is called the \emph{argument signature} of the attribute A, and it is denoted $\alpha(A)$.
+\end{definition}
+
+One special case of an attribute is a \emph{relation}, where the value of the attribute is binary valued denoting whether the relationship holds true or not.  
+
+Since we are considered with generating random variables, we will be specifically requiring that attribute map to a probability space. 
+We can view our definition of attribute as a special case of a deterministic probability distribution, and we wish to soften this to non-deterministic probability distributions. 
+
+Technically we can map to arbtirarily different probability spaces, but we would normal fix a sample space and event space for every probability space for a specific attribute, although the probability measures may vary. 
+We would not be able to do this if the sample spaces varied as well, unless we mode copies of them for each instantiation.
+
+\begin{definition}[Template Variable]
+  A template variable is an attribute mapping to a sample space and event space, and possibly some restriction of probability measures.
+  \begin{equation}
+    A \colon U_1, \ldots, U_k \rightarrow ( \Omega_{ A }, \mathcal{E}_{ A },\mathcal{D}_{ A} )
+    \label{template variable}
+  \end{equation}
+  We restrict the instantiations of our random variables to a subset of probability distributions $\mathcal{D}_{ A } \subseteq \mathcal{D}_{ \Omega_{ \Omega_{A},\mathcal{E}_{ A } } }$
+\end{definition}
+
+
+\subsection{Instantiation}
+  We want to define a domain of a set of attributes, and we will map each input to a different tuple of probability spaces, where the tuple denotes that there is a different random variable for each attribute. 
+  The domain of a set of attributes is called the object skeleton, and the range is the set of instantiations/ground random variables.
+
+  \begin{definition}[Object skeleton]
+    Let $\mathcal{Q}$ be a set of classes, and $\aleph$ a set of template attributes over $\mathcal{Q}$. 
+    An \emph{object skeleton} $\kappa$ specifies a fixed, finite set of objects $\mathcal{O}^{ \kappa }\left[ Q \right]$ for every $Q \in \mathcal{Q}$. 
+    We also define
+    \begin{equation}
+      \mathcal{O}^{\kappa}\left[ U_1,\ldots,U_k \right] = \mathcal{O}^{\kappa}\left[ Q\left[ U_1 \right] \right] \times \ldots \times \mathcal{O}^{\kappa}\left[ Q\left[ U_k \right] \right] 
+      \label{}
+    \end{equation}
+    By default, we define $\Gamma_{ \kappa }\left[ A \right] = \mathcal{O}^{\kappa}\left[ \alpha(A) \right]$ to be the set of possible assignments to the ``logical variables'' in the argument signature of A. 
+    However, an object skeleton may also specify a subset of legal assignments $\Gamma_{ \kappa }\left[ A \right] \subset \mathcal{O}^{\kappa}\left[ \alpha(A) \right]$.  
+  \end{definition}
+  
+  \begin{definition}[Ground Random Variable]
+    Let $\kappa$ be an object skeleton over $\mathcal{Q},\aleph$. 
+    We define sets of ground random variables:
+    \begin{equation}
+      \begin{split}
+        \mathcal{X}_{ \kappa }\left[ A \right] = \left\{ A(\gamma)  \right\} \colon \gamma \in \Gamma_{\kappa}\left[ A \right], \\
+	\mathcal{X}_{ \kappa }\left[ \aleph \right] = \cup_{A \in \aleph} \mathcal{X}_{\kappa}\left[ A \right].
+      \end{split}
+      \label{eqn:ground random variable}
+    \end{equation}
+    Note that we are abusing notation here. 
+    $\gamma = <u_1,\ldots, u_k>$ means $u_i \in f_A(U_1)$, since our attribute maps each input variable to a class of $\mathcal{Q}$, and this is unambiguous due to our using a tuple.
+  \end{definition}
+
+  Note we are considering these sets of ground random variables, and each may come from the assignment of different attributes, but our sets of random variable does not specify which attribute induced the ground random variable.  
+Moreover, each ground random variable is instantiated uniquely, so different attributes and different assignments cannot map to the same ground random variable.
+
+
+Koller and Friedman argue that this a template for an infinite set of probability distributions.  For predefined classes with predefined elements (and finite) elements, this is not true, so what they are actually arguing is that we can vary the (number of) elements of each class, which allows us to generate an arbitrary number of probability distributions.
+
+
+Simplifying assumptions: the skeletons define sets (sets of tuples?) of objects for each classes, but we can include relations as well, which would also be considered objects, though they would be relationships dependent on some of the input argument variables.  
+Conversely, we may want to have ``uncertainty over the number of objects in the domain''.  
+They connect that with a seemingly separate idea, that there may be ``worlds'' where $A(u)$ is defined when the world contains $u$ but not in others. I guess then we have overlapping sets of skeletons.
+
+\subsection{Template Factors}
+
+We've basically defined a conditional probability distribution (with some abuse of measure theory that is fine in the discrete case), in the case where the arguments and the attribute instantiations are random variables.
+
+We want to extend that to the factor potentials of Markov networks.  Now our template factor denotes something more like a ``joint distribution'' on the space of arguments as opposed to a single new variable, although just like with factors they are not necessarily the marginals of the true joint distribution.
+We are specifically interested in the induced probability measure, which will provide us a mapping to the real numbers.  We can relax the probability measure restriction, since factors can have non-negative values greater than 1.
+
+Recall that a factor $\phi$ is a function from a tuple of random variables $\mathbf{X} = Scope\left[ \phi \right]$ to the reals.
+
+\begin{definition}[Template Factor]
+  A \emph{template factor} is a function $\xi$ defined over a tuple of template attributes $A_1,\ldots,A_l$, where each $A_j$ has a range (sample space) Val(A).
+  \begin{equation}
+    \xi \colon Val(A_1) \times \ldots \times Val(A_l) \rightarrow \mathbb{R}
+    \label{eqn:template factor}
+  \end{equation}
+  Given a tuple of random variables $X_1,\ldots,X_l$, such that $Val(X_j) = Val(A_j)$ for all $j = 1, \ldots, l$, we define $\xi\left( X_1,\ldots,X_l \right)$ to be the \emph{instantiated factor} from \textbf{X} to $\mathbb{R}$.
+\end{definition}
+
+Note that have jumped from attributes to template attributes, so each attribute generates a random variable when assigned its respective arguments. 
+We also have an inconsistency, whereas the attributes mapped to probability spaces and varied through their probability measure, but when used as an argument we are concerned with the sample spaces as opposed to the probability measures.  
+
+
+Finally, for probabilistic graphical models, the actual probability measure may not be specified, so the instantiated templates and template factors must correspond to PGMs with a specific joint distribution.
+
+\end{document}
