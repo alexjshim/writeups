@@ -1,0 +1,137 @@
+%        File: weighted.tex
+%     Created: Thu Jan 28 05:00 PM 2021 P
+% Last Change: Thu Jan 28 05:00 PM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath}
+\begin{document}
+
+\section{Formulaic coincidences}
+
+We observe a few remarkable coincidences for certain formulas in machine learning
+
+Boosting:
+The empirical data set is weighted
+
+\begin{equation}
+  \mathcal{D} = \{ (w_n, x_n): n \in \{1, \ldots, N \} \}
+  \label{}
+\end{equation}
+
+Friedman (2000) interpreted boosting as optimization of an exponential error function
+
+\begin{equation}
+  E = \sum_{n=1}^N \exp \{ -t_n f(x_n) \}
+  \label{}
+\end{equation}
+
+Log-sum-exp is a common optimization function in convex optimization.  Interestingly, the convex conjugate of this function is the negative entropy over a discrete distribution.  
+This is used in Jaynes' derivation of the maximum entropy distribution.
+
+\begin{equation}
+  \begin{split}
+    f(x) = \log \left( \sum_{n=1}^N e^{x_n} \right) \\
+    f^*(y) = \sum_{n=1}^N y_i \log y_i
+  \end{split}
+  \label{}
+\end{equation}
+
+In fact, with weights it's the posynomial form of geometric programming (Boyd, ):
+
+\begin{equation}
+  \begin{split}
+    f(x) = \sum_{n=1}^N c_k x_1^{ a_{1k} } x_2^{ a_{ 2k } } \cdots x_n^{ a_{ dk } } \\
+    \min \quad & f(x) = \sum_{n=1}^N e^{ \left< a_{0n}, y \right> + b_{0n} } \\
+    \text{subject to} \quad & \left< a_{mn}, y \right> + b_{mn} , m \in \{ 1, \ldots, M \}
+  \end{split}
+  \label{}
+\end{equation}
+
+Another amazing coincidence is that log-sum-exp is the log normalization constant/log partition function of a multinoulli distribution, with unnormalized probabilities
+
+\begin{equation}
+  \begin{split}
+    Z = \sum_{n=1}^N e^{ t_n \log \tilde{p}_n } \\
+    \log Z = \log \left( \sum_{n=1}^N e^{ \left< t_n, \eta_n \right> } \right) \\
+  \end{split}
+  \label{}
+\end{equation}
+
+In the derivation of free energy, we observe that the upper bound of the free energy for a given energy function is the log normalizer of the Boltzmann distribution of that energy function
+
+\begin{equation}
+  \text{Free energy} = E_{x \sim p(x)} \left[ E(x) \right] - T E_{ x \sim p(x) } \left[ \log p(x) \right]
+  \label{}
+\end{equation}
+
+We also observe that with a given energy function and expected energy is constant, optimizing the Helmholtz free energy is equivalent to optimizing entropy.
+
+An exponential family can be generated from an intrinsic measure from a Laplace transform, which literally calculates a normalization factor.
+
+\begin{equation}
+  \mathcal{L} h(y) = \int e^{ \left< y, x \right> } h(x) dx
+  \label{}
+\end{equation}
+
+In a uniform discrete case, this is the sum of exponents.  In the weighted discrete case, this is a weighted sum of exponents.
+
+\begin{equation}
+  \begin{split}
+    \mathcal{L} \left( \frac{1}{N} \sum_{n=1}^N \delta\left( x = x_n \right) \right) = \sum_{n=1}^N \frac{1}{N} e^{ \left< y, x_n \right> } \\
+    \mathcal{L} \left( \sum_{n=1}^N w_n \delta\left( x = x_n \right) \right) = \sum_{n=1}^N w_n e^{ \left< y, x_n \right> }
+    \label{}
+  \end{split}
+  \label{}
+\end{equation}
+
+For sequential estimation, sequential models use bootstrapping of samples at every time step, to create a weighted empirical distribution approximating the posterior.  
+This can be seen as equivalent to a mixture distribution.
+
+\begin{equation}
+  \begin{split}
+    p( z_{n+1} \vert X_n ) = \int p(z_n \vert X_n) p(z_{n+1} \vert z_n ) dz_n \\
+    \approx w_n^{(l)} p( z_{n+1} \vert z_n^{(l)} )
+    \label{}
+  \end{split}
+  \label{}
+\end{equation}
+
+In Importance Weighted Auto-encoders, the weights are equivalent to sampling from the importance weighted posterior (Domke and Sheldon, 2019, Agakov and Barber, 2004), which is a marginalization over an auxiliary variable:
+
+\begin{equation}
+  \begin{split}
+    \log p(x) = E \left[ \log \left( \frac{1}{M} \sum_{m=1}^M \frac{p(z_m,x)}{q(z_m)} \right) \right] + KL \left( q_{IWAE}(z_{1:M} \Vert p_{IWAE}( z_{1:M} \right)
+    E_{ s(\omega) } \left[ R( \omega, x ) a(z \vert \omega, x) \right] = p(z,x)
+  \end{split}
+  \label{}
+\end{equation}
+
+\section{}
+
+Using the same argument, we can add a factor potential to a PGM / add an energy function to an energy based model, and that would be equivalent to adding a weight:
+
+\begin{equation}
+  \begin{split}
+    \tilde{P}_{\Theta} ( \mathcal{X} ) = \prod_i e^{ \phi(C_i) } \\
+    \tilde{P}_{\Theta}' ( \mathcal{X} ) = e^{ \phi'(C_{i'}) } \tilde{P}_{\Theta} \\
+    = E_{ c_{i'} \sim e^{\phi'( C_{i'} ) } } \left[ \tilde{P}_{\Theta} \vert c_{i'} \right] \\
+    \approx \sum_{m=1}^M w_m \tilde{P}_{\Theta} \vert c_{i'}
+  \end{split}
+  \label{}
+\end{equation}
+
+This can be seen as integrating or marginalizing over a (potentially infinite) ensemble of models.
+
+Generalization error is studied in statistical learning theory, and it creates bounds due to finite sampling estimation.  
+Interestingly enough, a derivation of Hoeffding's inequality, for a Bernoulli distribution for classification, involves calculating a continuous bound on the binomial distribution, and this likelihood has an exponentiated KL-divergence term:
+
+\begin{equation}
+  P_{ X_1,\ldots,X_N \sim P_{data}(X) } \left( E_{ x \sim P_{emp}(x) } \left[ 1(x) = q \right] \right) \approx \left( 2 \pi N q(1-q) \right)^{ - \frac{1}{2} } e^{ - N KL \left( \text{Binomial}(q) \Vert \text{Binomial}(p) \right) }
+  \label{}
+\end{equation}
+
+
+
+\end{document}
+
+
