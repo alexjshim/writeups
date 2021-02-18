@@ -4,81 +4,77 @@
 %
 \documentclass[a4paper]{article}
 \usepackage[]{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{problem}{Problem}[section]
 
 \begin{document}
 
 \section{Notation}
 
-$X$ random variable
-$x$ instantiation/sample of the random variable $X$
-$u(X_1, \ldots, X_N)$ sufficient statistic
-$\theta$ parameterization of the distribution
-$\eta$ natural parameter
-$Z(\eta)$ normalization factor
-$g(\eta)$ inverse normalizer
+$X$ random variable \\ 
+$x$ instantiation/sample of the random variable $X$ \\
+$u(X_1, \ldots, X_N)$ sufficient statistic \\
+$\theta$ parameterization of the distribution \\
+$\eta$ natural parameter \\
+$Z(\eta)$ normalization factor \\
+$g(\eta)$ inverse normalizer \\
 $h(x)$ intrinsic/carrier measure
 
 \section{Sufficiency}
 
 Fisher-Neyman factorization
 
-One explanation of a sufficient statistic is that it contains all relevant information about observations for inferring the parametrization.
+One explanation of a sufficient statistic is that it contains all relevant information about observations for inferring the parametrization.  We wish to understand what this means.
 
-Suppose we know nothing about our data distribution, $P_{data}(X)$.  What would be an appropriate sufficient statistic?  
+\begin{problem}
+Suppose we know nothing about our data distribution, $P_{data}(X)$.  What would be an appropriate sufficient statistic?  \\
 What do we need to specify beforehand before we can define a sufficient statistic?  
+\end{problem}
 
-Suppose we have two sets of samples of size $N$, from a normal distribution $\mathcal{N}( \mu, \sigma^2 I )$, where $\sigma^2$ is known but $\mu$ is unknown.  
-Further suppose that we have a normal prior, $P(\mu) = \mathcal{N}(0,I)$.  
-The sufficient statistic is the either the mean or the sum of the samples, so 
-
+\begin{problem}
+  Suppose we have two sets of samples of size $N$, $\{x_1,\ldots,x_N\},\{x_1',\ldots,x_N'\}$ from a normal distribution $\mathcal{N}( \mu, \sigma^2 )$, where $\sigma^2$ is known but $\mu$ is unknown.  \\
+  Further suppose that we have a normal prior, $P(\mu) = \mathcal{N}(0,1)$.  \\
+  The sufficient statistic is the sum of the samples, so 
 \begin{equation}
   \begin{split}
-    u(x_1,\ldots,x_N) = \frac{1}{N} \sum_n x_n \\
-    = u(x_1',\ldots,x_N') = \frac{1}{N} \sum_n x_n' \\
+    u(x_1,\ldots,x_N) = \sum_n x_n \\
+    = u(x_1',\ldots,x_N') = \sum_n x_n' \\
   \end{split}
   \label{}
 \end{equation}
-
 Is it true that we assume equal posterior probabilities?
-
 \begin{equation}
-  P( \theta = 1 \vert x_1,\ldots,x_N ) = P( \theta = 2 \vert x_1', \ldots, x_N')
+  P( \mu = 1 \vert x_1,\ldots,x_N ) = P( \mu = 2 \vert x_1', \ldots, x_N')
+  \label{}
+\end{equation}
+Suppose the sufficient statistic is the same.  How do the posteriors compare?
+\begin{equation}
+  P( \mu = 1 \vert x_1,\ldots,x_N, u(x_1,\ldots,x_N) = C ) = P( \mu = 2 \vert x_1',\ldots,x_N', u(x_1',\ldots,x_N') = C ) ?
   \label{}
 \end{equation}
 
-Suppose now that we now have two gaussian distributions with the same variance, $\mathcal{N}(-1,1)$ and $\mathcal{N}(1,1)$.  We pick with equally probability one of these distributions, and then we can sample from it repeatedly.
-Now we decide to sample $N$ times, but we reject/discard and resample any samples with $x<0$ (but we always end up with a total of $N$ accepted samples).
+\end{problem}
 
-The sufficient statistic is still the mean (you can try to justify this).
+\begin{problem}
+Suppose two sets of samples of size $N$, $\{x_1,\ldots,x_N\},\{x_1',\ldots,x_N'\}$, from a family of distributions parametrized by $\theta$ with sufficient statistic $u$.
 
-For 2 samples, suppose we have a sufficient statistic of 2, so $x_1 + x_2 = 2$.  Compare
+Suppose $u(x_1,\ldots,x_N) = u(x_1',\ldots,x_N')$.  Can you find an example where $ \prod_n P(x_n \vert \theta) \neq \prod_n P(x_n \vert \theta') $?
+\end{problem}
 
-\begin{equation}
-  \begin{split}
-    P( x_1 = -1, x_2 = 3 \vert \mu ) \\
-    P( x_1 = 1, x_2 = 1 \vert \mu )
-  \end{split}
-  \label{}
-\end{equation}
+\begin{problem}
+  Suppose now that we now have two gaussian distributions with the same variance, $\mathcal{N}(-1,1)$ and $\mathcal{N}(1,1)$.  We pick with equal probability one of these distributions but without knowing which one, and then we can sample from it repeatedly. \\
+Now we repeatedly to sample this distribution $N$ times, but we reject/discard and resample any samples with $x<0$ (but we always end up with a total of $N$ accepted samples).
+
+The sufficient statistic is still the mean (you can try to justify this, though it might be hard).
+
+Can you come up with an example of $\{x_1,\ldots,x_N\}, \{x_1',\ldots,x_N'\}$ with the same sufficient statistic but different likelihoods?
+\end{problem}
 
 We can conclude
 
 \begin{equation}
   P( x_1, \ldots, x_N \vert \theta, u(x_1,\ldots,x_N) = C ) \neq P( x_1', \ldots, x_N' \vert \theta, u(x_1',\ldots,x_N') = C )
-  \label{}
-\end{equation}
-
-Suppose two sets of samples (assume with the same size) have the same sufficient statistic $u$, given a family of distriubtions parametrized by $\theta$.
-
-\begin{equation}
-  u(x_1,\ldots,x_N) = u(x_1',\ldots,x_N')
-  \label{}
-\end{equation}
-
-Can we have
-
-\begin{equation}
-  \prod_n P(x_n \vert \theta) \neq \prod_n P(x_n \vert \theta')
   \label{}
 \end{equation}
 
@@ -102,9 +98,12 @@ It also means that
   \label{}
 \end{equation}
 
-Problem: explain what this equation means in terms of inferring the parameters given the sufficient statistic.
+\begin{problem}
+Explain what this equation means in terms of inferring the parameters given the sufficient statistic.
+\end{problem}
 
-Problem: assuming the above, prove the Fisher-Neyman factorization theorem.
+\begin{problem}
+Assuming the above, prove the Fisher-Neyman factorization theorem.
 
 \begin{equation}
   p(x \vert \theta) = h(x) f_\theta( u(x) )
@@ -112,48 +111,167 @@ Problem: assuming the above, prove the Fisher-Neyman factorization theorem.
 \end{equation}
 
 where $h(x)$,$f_\theta$ are non-negative functions.
+\end{problem}
 
-Problem: 
-Draw a (graphical) relationship between a sample, $\mathcal{D} = X_1,\ldots,X_N)$, the sufficient statistic $u(x_1, \ldots, x_N)$, and the parametrization, $\theta$.  
+\begin{problem}
+Draw a (graphical) relationship between a sample, $\mathcal{D} = X_1,\ldots,X_N)$, the sufficient statistic $u(x_1, \ldots, x_N)$, and the parametrization, $\theta$. 
 Use a double forward arrow to indicate deterministic relationships.
+\end{problem}
 
 \section{Pitman-Koopman-Dermois Theorem}
 
-\section{Gradient properties of exponential families}
-
-Problem:
-
-Derive an expression for $ \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics directly.
-
-Derive an expression for $ \nabla_\eta \log Z(\eta) $ from the fact that $ \int P( x \vert \eta) dx = 1 $.
-
-Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics.
-
-Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic.
-
-Prove that $ \log Z(\eta)$ is a convex function.
-(Hint: use results from the above problem)
-
-Prove that the domain of natural parameters is convex.
-
-Assuming that the covariance of the sufficient statistic is positive definite ( equivalently, that the variance constrained along any vector is positive), prove that there is a one-to-one relationship between $\eta$ and the expected sufficient statistic.
-
-Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert \eta) } [ u(x) ] ) = \eta $, exists and is one-to-one.
-
-(Moment matching) Using gradients / derivatives, derive a condition for the M-projection:
+Suppose we have the sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_1) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
 
 \begin{equation}
-  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(X) \log \frac{ P_{data}(X) }{ P( x \vert \eta) }
+  f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N) )
   \label{}
 \end{equation}
 
+Then we can express parametrize the distribution by the natural parameters, $\eta$, such that
+
+\begin{equation}
+  P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}
+  \label{}
+\end{equation}
+
+where 
+
+\begin{equation}
+  \begin{split}
+    \tilde{P} := h(x) e^{ \left< u(x), \eta \right> } \\
+    Z(\eta) := \int h(x) e^{ \left< u(x), \eta \right> } \\
+    g(\eta) := \frac{1}{Z(\eta)}
+  \end{split}
+  \label{}
+\end{equation}
+
+\begin{problem}
+Show that it satisfies the Fisher-Neyman factorization.
+\end{problem}
+
+\section{Gradient properties of exponential families}
+
+
+\begin{problem}
+Derive an expression for $ \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics directly.
+\end{problem}
+
+\begin{problem}
+Derive an expression for $ \nabla_\eta \log Z(\eta) $ from the fact that $ \int P( x \vert \eta) dx = 1 $.
+\end{problem}
+
+\begin{problem}
+Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics.
+\end{problem}
+
+\begin{problem}
+Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic.
+\end{problem}
+
+\begin{problem}
+Prove that $ \log Z(\eta)$ is a convex function.
+(Hint: use results from the above problem)
+\end{problem}
+
+\begin{problem}
+Prove that the domain of natural parameters is convex.
+\end{problem}
+
+\begin{problem}
+Assuming that the covariance of the sufficient statistic is positive definite ( equivalently, that the variance constrained along any vector is positive), prove that there is a one-to-one relationship between $\eta$ and the expected sufficient statistic.
+\end{problem}
+
+\begin{problem}
+Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert \eta) } [ u(x) ] ) = \eta $, exists and is one-to-one.
+\end{problem}
+
+\begin{problem}
+(Moment matching) Using gradients / derivatives, derive a condition for the M-projection:
+
+\begin{equation}
+  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(X) \log \frac{ P_{data}(X) }{ P( X \vert \eta) }
+  \label{}
+\end{equation}
+\end{problem}
+
+\begin{problem}
 Derive a way of estimating an M-projection given samples from an exponential family.
+\end{problem}
+
+\section{Probabilistic Graphical Models}
+
+\section{Exponential families and convex optimization duality}
+
+The convex conjugate / Fenchel transform / Legendre-Fenchel transform is the function to a (potentially non-convex) function.
+
+A notational note, we will use lowercase $x$ here for random variables, instead of instantiations, since we are not considering samples in this section.
+
+\begin{equation}
+  f^*( \lambda ) = \sup_{x \in X} \left( \left< \lambda, x \right> - f(x) \right)
+  \label{convex conjugate}
+\end{equation}
+
+Let $G(\eta)$ be the log normalizer:
+
+\begin{equation}
+  G(\eta) = \log Z(\eta) = \int h(x) e^{ \left< u(x), \eta \right> } dx
+  \label{}
+\end{equation}
+
+Then we can re-expresss the exponential family formula as
+
+\begin{equation}
+  P( x \vert \eta) = h(x) e^{ \left< u(x), \eta \right> - G(\eta) }
+  \label{}
+\end{equation}
+
+Let's consider the convex conjugate of the log normalizer:
+
+\begin{equation}
+  F( \lambda ) = \sup_\eta \left( \left< \lambda, \eta \right> - G(\eta) \right)
+  \label{}
+\end{equation}
+
+Problem:  
+Solve for $ \nabla_\eta \left( \left< \lambda, \eta^* \right> - G(\eta) \right) = 0 $, specifically show that $ \lambda = E_{ x \sim P( x \vert \eta^*) } \left[ u(x) \right] $ .  Is this a global maximum?  
+
+Using the above formula for $\lambda$, what is $F(\lambda)$?  
+
+What is $\nabla_\lambda F(\lambda)$ ?  This gives us a formula for the canonical link function.
+
+Fenchel's inequality is a direct result of the definition of the convex conjugate
+
+\begin{equation}
+  f^*( \lambda) + f(x) \leq \left< \lambda, x \right>
+  \label{Fenchel's inequality}
+\end{equation}
+
+We observe that the exponential form of an exponential family resembles the term inside the convex conjugate:
+
+\begin{equation}
+  P( x \vert \eta) = h(x) e^{ \left< u(x), \eta \right> - G(\eta) } \leq h(x) e^{ F( \bar{u} ) }
+  \label{}
+\end{equation}
+
+And that it is maximized when $u(x)$ is the expected sufficient statistic.  This means the mean sufficient statistic is related to its mode (disregarding $h(x)$ for now).  
+
+Suppose we were to define an exponential family for the natural parameter:
+
+\begin{equation}
+  P( \eta \vert \lambda ) = h^*(\eta) e^{ \left< \lambda, \eta \right> - F(\lambda) }
+  \label{}
+\end{equation}
+
+We can use Fenchel's inequality for $F(\lambda)$
+
+\begin{equation}
+  P( \eta \vert \lambda ) = h^*(\eta) e^{ \left< \lambda, \eta - \eta^* \right> + G(\eta) }
+  \label{<++>}
+\end{equation}<++>
 
 
 
-
-
-
+Free energy?
 
 \end{document}
 
