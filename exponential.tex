@@ -4,6 +4,7 @@
 %
 \documentclass[a4paper]{article}
 \usepackage[]{amsmath}
+\usepackage{amssymb}
 \usepackage{amsthm}
 
 \newtheorem{problem}{Problem}[section]
@@ -11,6 +12,7 @@
 \begin{document}
 
 \section{Notation}
+
 
 $X$ random variable \\ 
 $x$ instantiation/sample of the random variable $X$ \\
@@ -23,7 +25,7 @@ $h(x)$ intrinsic/carrier measure
 
 \section{Pitman-Koopman-Dermois Theorem}
 
-Suppose we have the sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_1) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
+Suppose a sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_n) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
 
 \begin{equation}
   f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N) )
@@ -35,24 +37,20 @@ Then we can express parametrize the distribution by the natural parameters, $\et
 \begin{equation}
   P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}
   \label{}
-\end{equation}
+\end{equation} 
 
 where 
 
 \begin{equation}
   \begin{split}
-    \tilde{P} := h(x) e^{ \left< u(x), \eta \right> } \\
-    Z(\eta) := \int h(x) e^{ \left< u(x), \eta \right> } \\
-    g(\eta) := \frac{1}{Z(\eta)}
+    \tilde{P}(X) &:= h(x) e^{ \left< u(x), \eta \right> } \\
+    Z(\eta) &:= \int h(x) e^{ \left< u(x), \eta \right> } dX \\
+    g(\eta) &:= \frac{1}{Z(\eta)}
   \end{split}
   \label{}
 \end{equation}
 
-\begin{problem}
-Show that it satisfies the Fisher-Neyman factorization.
-\end{problem}
-
-\begin{problem} The German Tank Problem
+\begin{problem} 
 Find a probability distribution that has a sufficient statistic, but is not an exponential family distribution.  Is it an additive sufficient statistic?
 \end{problem}
 
@@ -60,17 +58,7 @@ Find a probability distribution that has a sufficient statistic, but is not an e
   What is the difference between a normal distribution and an exponential family of distributions?
 \end{problem}
 
-\begin{problem}
-  Bishop shows that the family of Bernoulli distributions is an exponential family (and Bernoulli is a special case of the binomial distribution).  However, there is a mistake/problem with Bishop's definition, what is it??
-\end{problem}
-
-\begin{problem}
-  Give an exponnential family that contains the binomial distribution (discrete distribution of n coin flips with the probability of heads being p).
-\end{problem}
-
-\begin{problem}
-  Given a pdf, we $p(x \vert \theta)$, we can write $p(x) = e^{\log p( x \vert \theta)}$.  This seems to suggest any pdf can be turned into an exponential family.  But that is not quite correct.  Give conditions when this trick will and will not work.
-\end{problem}
+The following are two more complicated distributions.  Challenge yourself to see if you can convert them to exponential family form.
 
 \begin{problem}
   The Weibull distribution was used to model the distribution for the onset of covid cases.  \\
@@ -95,12 +83,39 @@ Express the Weibull distribution as an exponential family, with a sufficient sta
     \end{split}
     \label{Gumbel}
   \end{equation}
-Is it an exponential family?
+Is it an exponential family?  If so, find a minimal sufficient statistic and natural parameters.
 \end{problem}
+
+The following are more conceptual questions.
+
+\begin{problem}
+  Bishop shows that the family of Bernoulli distributions is an exponential family (and Bernoulli is a special case of the binomial distribution).  However, there is a mistake/problem with Bishop's definition, what is it??
+\end{problem}
+
+\begin{problem}
+  Give an exponential family that contains the binomial distribution (discrete distribution of n coin flips with the probability of heads being p).
+\end{problem}
+
+\begin{problem}
+  Given a pdf, we $p(x \vert \theta)$, we can write $p(x) = e^{\log p( x \vert \theta)}$.  This seems to suggest any pdf can be turned into an exponential family.  But that is not quite correct.  Give conditions when this trick will and will not work.
+\end{problem}
+
+\begin{problem}
+Show that an exponential family distribution satisfies the Fisher-Neyman factorization theorem
+
+\begin{equation}
+  p(x \vert \theta) = h(x) f_\theta( u(x) )
+  \label{}
+\end{equation}
+
+where $h(x)$,$f_\theta$ are non-negative functions.
+
+\end{problem}
+
 
 \section{Sufficiency}
 
-Fisher-Neyman factorization
+This is a more advanced, theoretical section (as in you may want to skip this for later), which is meant to solidify our understanding of the mysterious concept of sufficiency.  An understanding of this is important for ideas about perfect and imperfect data reduction, such as Tishby's Information Bottleneck. \\
 
 One explanation of a sufficient statistic is that it contains all relevant information about observations for inferring the parametrization.  We wish to understand what this means.
 
@@ -196,14 +211,14 @@ Use a double forward arrow to indicate deterministic relationships.
 \end{problem}
 
 
-\section{Gradient properties of exponential families}
+\section{Gradients of exponential families and statistical modeling}
 
+\subsection{Gradients}
+
+The first three problems are very fundamental to exponential families and machine learning, and have some level of progression.
 
 \begin{problem}
-Derive an expression for $ \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics directly.
-\end{problem}
-
-\begin{problem}
+Derive an expression for $ \nabla_\eta \log Z(\eta) $ (Hint: in terms of the sufficient statistics). \\
 Derive an expression for $ \nabla_\eta \log Z(\eta) $ from the fact that $ \int P( x \vert \eta) dx = 1 $.
 \end{problem}
 
@@ -212,32 +227,43 @@ Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $ in terms of th
 \end{problem}
 
 \begin{problem}
-Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic.
+Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic. \\
+Suppose we have samples $\left\{ X_1, \ldots, X_N \right\}$ from a data distribution $P_{data}(X)$. We can define an empirical distribution, $ P_{emp}(X) = \frac{1}{N} \sum_{n=1}^N \delta(X = X_n) $.  \\
+Derive an expression for
+
+\begin{equation}
+  \nabla_\eta KL\left( P_{emp}(X) \Vert P( X \vert \eta) \right) = \nabla_\eta \int P_{emp}(X) \log \frac{P_{emp}(X)}{P( X \vert \eta) } dX
+  \label{}
+\end{equation}
+\end{problem}
+
+\subsection{Discriminative Modeling}
+The next three problems are increasingly more complex versions of the same problem.  Choose one.
+
+\begin{problem}
+  Suppose we have online samples of a Bernoulli distribution with an unknown probability.  Derive a first-order and Newton's method second-order gradient-based update of the distribution parameters.
 \end{problem}
 
 \begin{problem}
-  Suppose we have online samples of a bernoulli distribution with an unknown mean.  Derive a first order and second order gradient-based update of the distribution parameters.
-\end{problem}
-
-\begin{problem}
-  Suppose we have a online samples $\{(X_n,Y_n)\}_n$ for a logistic regression model
+  Suppose we have a online samples ${(X,Y)}$ for a logistic regression model
   \begin{equation}
-    P( Y \vert X, W) = \sigma( \left< W, X \right> )
+    P( Y \vert X, W) = \sigma( \sum_k w_k X_k )
     \label{logistic}
   \end{equation}
   Derive a first order and second order gradient-based update for the parameters $W$.
 \end{problem}
 
-\begin{problem}
-Prove that $ \log Z(\eta)$ is a convex function.
-(Hint: use results from the above problem)
+\begin{problem} Generalized Linear Models (GLM) \\
+  Derive a gradient update for $P_W( Y \vert X) \in Poisson(\lambda) $, where $\eta = \sum_k w_k X_k )$.
 \end{problem}
 
-\begin{problem}
-Prove that the domain of natural parameters is convex.
-\end{problem}
+\subsection{Convex Analysis}
 
+The next two problems are more theoretical and are optional if you're not overly concerned about convex analysis.
 \begin{problem}
+Prove that $ \log Z(\eta)$ is a convex function. 
+(Hint: use results from the above problem)  \\
+Prove that the domain of natural parameters is convex.  \\
 Assuming that the covariance of the sufficient statistic is positive definite ( equivalently, that the variance constrained along any vector is positive), prove that there is a one-to-one relationship between $\eta$ and the expected sufficient statistic.
 \end{problem}
 
@@ -245,11 +271,30 @@ Assuming that the covariance of the sufficient statistic is positive definite ( 
 Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert \eta) } [ u(x) ] ) = \eta $, exists and is one-to-one.
 \end{problem}
 
-\begin{problem}
-(Moment matching) Using gradients / derivatives, derive a condition for the M-projection:
+\subsection{KL divergence and M-projections}
 
 \begin{equation}
-  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(X) \log \frac{ P_{data}(X) }{ P( X \vert \eta) }
+  KL \left( P(X) \Vert Q(X) \right) := \int P(X) \log \frac{P(X)}{Q(X)} dX
+  \label{KL}
+\end{equation}
+
+\begin{problem}
+Derive a simplified expression for $ KL\left( P( x \vert \eta') \Vert P( x \vert \eta) \right)$ in terms of the natural parameters and expected sufficient statistics.  \\
+What is $ KL\left( \mathcal{N} \left( \mu_1,\Sigma_1 \right) \Vert \mathcal{N} \left( \mu_2, \Sigma_2 \right) \right) $ ?
+\end{problem}
+
+\begin{problem}
+Moment matching / M-projections \\
+What is 
+\begin{equation}
+  \nabla_\eta KL\left( P( X \vert \eta') \Vert P( X \vert \eta) \right)
+  \label{}
+\end{equation}
+(Hint: do not use the final result of the above problem).
+Using gradients / derivatives or the previous problem, derive a condition for the M-projection:
+
+\begin{equation}
+  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(X) \log \frac{ P_{data}(X) }{ P( X \vert \eta) } dX
   \label{}
 \end{equation}
 \end{problem}
