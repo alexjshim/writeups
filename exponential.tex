@@ -315,7 +315,27 @@ The unnormalized probability distribution is called the Gibbs distribution:
 \end{equation}
 
 \begin{problem}
-  If each of the factors is an exponential family distribution, write the joint distribution as an exponential family.  \\
+  If each of the factors is an exponential family distribution (not necessary the same family), write the joint distribution as an exponential family.  \\
+\end{problem}
+
+\begin{problem} Log-Linear PGMs
+  For positive factors, we could could express themselves in terms of an energy function
+  \begin{equation}
+    \phi_i(D_i) = e^{ - \epsilon(D)}
+    \label{EBM}
+  \end{equation}
+  For an energy-based model, we assume an energy function $\epsilon(D)$, but we have an additional temperature term, $e^{-\frac{\epsilon(D)}{\tau}}$. \\
+  If we take the product of different energy-based models, with different temperatures, what are the sufficient statistics and the natural parameters of the joint distribution?
+\end{problem}
+
+\begin{problem}
+  Express an Ising model and a restricted Boltzmann machine as a log-linear energy-based model.  What are the energies?  
+\end{problem}
+
+Expectation Propagation
+\begin{problem}
+  Whenever we perform a marginalization, we have to perform an integration, which is not necessarily analytic, or a conjugate prior for the next factor. \\
+  Suppose $P(Z) = \mathcal{N}(\mu,\Sigma)$, and $P(X \vert Z)$ is Bernoulli (specifically it is a logistic model).  Suppose we want to approximate the posterior, $P(Z \vert X)$.  We can treat $P(X \vert Z)$ as an unnomralized distribution of $Z$, and make it conjugate to $P(Z)$.  How would we do this, using M-projections?  \\
 \end{problem}
 
 \section{Exponential families and convex optimization duality}
@@ -387,9 +407,53 @@ We can use Fenchel's inequality for $F(\lambda)$
   \label{<++>}
 \end{equation}<++>
 
-\section{EM and variational inference}
+\section{Conjugate Priors, EM and variational inference}
 
-Free energy?
+Bishop 2.4.2
+
+For every exponential family of the form $P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}$, there exists a conjugate prior in the form
+
+\begin{equation}
+  P( \eta \vert \chi, \nu) = f( \chi, \nu) g(\eta)^\nu e^{ \nu \left< \eta, \chi \right> }
+  \label{conjugate prior}
+\end{equation}
+
+\begin{problem}
+  What is the normalized posterior distribution for $\eta$, in terms of $f,g,X,\chi,\nu$?  Also, I believe Bishop may have made a mistake later on in chapter 10.4, it should be $\chi_N = \frac{ \sum_n u(x_n) + \nu \chi}{\nu + N }$.
+\end{problem}
+
+Challenge problem
+\begin{problem}
+  Suppose $P(Y \vert X, W)$ is in an exponential family, and assume $\eta = W \phi(X)$.  Come up with a prior for the weights that is conjugate to this exponential family, and derive a formula for the posterior of the weights.
+\end{problem}
+
+Expectation Maximization
+\begin{problem}
+  Suppose $P(X \vert Z)$ is a generalized linear model and $P(Z)$ is a conjugate prior.
+\begin{equation}
+  \begin{split}
+    P( X \vert Z; W) = g( W Z ) h(X) e^{\left< u(X), W Z \right> } \\
+    P( Z \vert \chi, \nu) = f(\chi,\nu) g(Z)^\nu e^{\left< Z, \nu \chi \right> }
+  \end{split}
+  \label{}
+\end{equation}
+What is the posterior distribution, $P(Z \vert X, W, \chi, \nu)$?  \\
+Maximize $W,\chi,\nu$ with respect to $W^{old},\chi^{old},\nu^{old}$.  What expressions do you need to know expectations in order to calculate this maximization?
+\end{problem}
+
+Variational Inference
+\begin{problem}
+
+\end{problem}
+
+Dynamic Bayesian Networks
+
+\begin{problem}
+  Suppose we have a hidden markov model, where $P(X^{(n) \vert Z^{(n)}}$ is from an exponential family, and $P( Z^{(n+1)} \vert Z^{(n)} )$ is based off the conjugate prior (maybe assume it's a linear model, to be similar to Kalman filters).  Derive a forward message passing / belief propagation algorithm.
+\end{problem}
+
+
+\section{Information Theory, Free energy, Bregman Divergence}
 
 \end{document}
 
