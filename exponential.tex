@@ -21,6 +21,83 @@ $Z(\eta)$ normalization factor \\
 $g(\eta)$ inverse normalizer \\
 $h(x)$ intrinsic/carrier measure
 
+\section{Pitman-Koopman-Dermois Theorem}
+
+Suppose we have the sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_1) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
+
+\begin{equation}
+  f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N) )
+  \label{}
+\end{equation}
+
+Then we can express parametrize the distribution by the natural parameters, $\eta$, such that
+
+\begin{equation}
+  P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}
+  \label{}
+\end{equation}
+
+where 
+
+\begin{equation}
+  \begin{split}
+    \tilde{P} := h(x) e^{ \left< u(x), \eta \right> } \\
+    Z(\eta) := \int h(x) e^{ \left< u(x), \eta \right> } \\
+    g(\eta) := \frac{1}{Z(\eta)}
+  \end{split}
+  \label{}
+\end{equation}
+
+\begin{problem}
+Show that it satisfies the Fisher-Neyman factorization.
+\end{problem}
+
+\begin{problem} The German Tank Problem
+Find a probability distribution that has a sufficient statistic, but is not an exponential family distribution.  Is it an additive sufficient statistic?
+\end{problem}
+
+\begin{problem}
+  What is the difference between a normal distribution and an exponential family of distributions?
+\end{problem}
+
+\begin{problem}
+  Bishop shows that the family of Bernoulli distributions is an exponential family (and Bernoulli is a special case of the binomial distribution).  However, there is a mistake/problem with Bishop's definition, what is it??
+\end{problem}
+
+\begin{problem}
+  Give an exponnential family that contains the binomial distribution (discrete distribution of n coin flips with the probability of heads being p).
+\end{problem}
+
+\begin{problem}
+  Given a pdf, we $p(x \vert \theta)$, we can write $p(x) = e^{\log p( x \vert \theta)}$.  This seems to suggest any pdf can be turned into an exponential family.  But that is not quite correct.  Give conditions when this trick will and will not work.
+\end{problem}
+
+\begin{problem}
+  The Weibull distribution was used to model the distribution for the onset of covid cases.  \\
+  The Weibull distribution has the cumulative distribution function
+  \begin{equation}
+    P( X \leq x \vert \lambda, k ) = \begin{cases}
+      1-e^{-\frac{x}{\lambda}^k} &, x \geq 0 \\
+      0 &, x <0
+    \end{cases}
+    \label{}
+  \end{equation}
+
+Express the Weibull distribution as an exponential family, with a sufficient statistic and natural parameters.
+\end{problem}
+
+\begin{problem}
+  The Gumbel distribution, which is used for the Gumbel-softmax trick for backpropagating through categorical distributions, is defined as
+  \begin{equation}
+    \begin{split}
+      P( x \vert \mu, \beta ) = \frac{1}{\beta} e^{-(z+e^{-z})}, \quad z:= \frac{x-\mu}{\beta} \\
+      P( X \leq x \vert \mu, \beta ) = e^{-e^{-\frac{x-\mu}{\beta}} }
+    \end{split}
+    \label{Gumbel}
+  \end{equation}
+Is it an exponential family?
+\end{problem}
+
 \section{Sufficiency}
 
 Fisher-Neyman factorization
@@ -118,36 +195,6 @@ Draw a (graphical) relationship between a sample, $\mathcal{D} = X_1,\ldots,X_N)
 Use a double forward arrow to indicate deterministic relationships.
 \end{problem}
 
-\section{Pitman-Koopman-Dermois Theorem}
-
-Suppose we have the sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_1) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
-
-\begin{equation}
-  f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N) )
-  \label{}
-\end{equation}
-
-Then we can express parametrize the distribution by the natural parameters, $\eta$, such that
-
-\begin{equation}
-  P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}
-  \label{}
-\end{equation}
-
-where 
-
-\begin{equation}
-  \begin{split}
-    \tilde{P} := h(x) e^{ \left< u(x), \eta \right> } \\
-    Z(\eta) := \int h(x) e^{ \left< u(x), \eta \right> } \\
-    g(\eta) := \frac{1}{Z(\eta)}
-  \end{split}
-  \label{}
-\end{equation}
-
-\begin{problem}
-Show that it satisfies the Fisher-Neyman factorization.
-\end{problem}
 
 \section{Gradient properties of exponential families}
 
@@ -166,6 +213,19 @@ Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $ in terms of th
 
 \begin{problem}
 Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic.
+\end{problem}
+
+\begin{problem}
+  Suppose we have online samples of a bernoulli distribution with an unknown mean.  Derive a first order and second order gradient-based update of the distribution parameters.
+\end{problem}
+
+\begin{problem}
+  Suppose we have a online samples $\{(X_n,Y_n)\}_n$ for a logistic regression model
+  \begin{equation}
+    P( Y \vert X, W) = \sigma( \left< W, X \right> )
+    \label{logistic}
+  \end{equation}
+  Derive a first order and second order gradient-based update for the parameters $W$.
 \end{problem}
 
 \begin{problem}
@@ -195,10 +255,23 @@ Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert
 \end{problem}
 
 \begin{problem}
-Derive a way of estimating an M-projection given samples from an exponential family.
+  Derive the M-projection of a probability distribution $P(X)$ on to the space of Gaussian distributions.  \\
+  What if you only had samples of $P(X)$?  How would you estimate the M-projection?
 \end{problem}
 
 \section{Probabilistic Graphical Models}
+
+Undirected Markov networks are defined by $\mathcal{M} = \left( \mathcal{H}, \Phi \right) $ are defined by their undirected graph $\mathcal{H}$ and their factors, $\Phi = \{ \phi_i(D_i) \}_i$.  
+The unnormalized probability distribution is called the Gibbs distribution:
+
+\begin{equation}
+  \tilde{P}_\Phi(\mathcal{X}) = \prod_i \phi_i(D_i)
+  \label{Gibbs distribution}
+\end{equation}
+
+\begin{problem}
+  If each of the factors is an exponential family distribution, write the joint distribution as an exponential family.  \\
+\end{problem}
 
 \section{Exponential families and convex optimization duality}
 
@@ -269,7 +342,7 @@ We can use Fenchel's inequality for $F(\lambda)$
   \label{<++>}
 \end{equation}<++>
 
-
+\section{EM and variational inference}
 
 Free energy?
 
