@@ -271,7 +271,7 @@ Assuming that the covariance of the sufficient statistic is positive definite ( 
 Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert \eta) } [ u(x) ] ) = \eta $, exists and is one-to-one.
 \end{problem}
 
-\subsection{KL divergence and M-projections}
+\subsection{KL divergence, M-projections, and I-projections}
 
 \begin{equation}
   KL \left( P(X) \Vert Q(X) \right) := \int P(X) \log \frac{P(X)}{Q(X)} dX
@@ -301,7 +301,23 @@ Using gradients / derivatives or the previous problem, derive a condition for th
 
 \begin{problem}
   Derive the M-projection of a probability distribution $P(X)$ on to the space of Gaussian distributions.  \\
-  What if you only had samples of $P(X)$?  How would you estimate the M-projection?
+  What if you only had samples of a Bernoulli distribution $P(X)$?  How would you estimate the M-projection?
+\end{problem}
+
+The first part of this problem is about the ``other'' KL divergence, which is used in variational inference and EM, and when using Boltzmann distributions it ties together ideas in thermodynamics and maximum entropy.
+
+\begin{problem}
+  Information projections / I-projections and thermodynamics\\
+  I-projections fix the right hand side of a KL divergence and vary the left-hand side. \\
+  Suppose are considering the I-projection of an exponential family distribution, over some class of distributions:
+  \begin{equation}
+    \text{argmin}_{Q(X) \in \mathcal{Q}} KL \left( Q(X) \Vert P( X \vert \eta) \right)
+    \label{I-projection}
+  \end{equation}
+  Assuming $P(X \vert \eta) = g(\eta) e^{\left< u(X), \eta \right> }$, expand the expression for $KL\left( Q(X) \Vert P( X \vert \eta) \right)$ in terms of the entropy of $Q(X)$ and other terms. \\
+  For a Boltzmann distribution, the sufficient statistic $u(X) := -\epsilon(X)$ is the negative energy function, $\eta := \frac{1}{T}$ is the inverse temperature, and we use $Z(\eta) = \frac{1}{g(\eta)}$.  Write out $KL \left( Q(X) \Vert P(X \vert \eta) \right)$, and use the fact that it is non-negative to write out an inequality for $- T \log Z(\eta)$. \\
+  This is called the Helmholtz free energy.  When the expected energy is constrained to be constant, how does the entropy of $Q(X)$ compare to the Helmholtz free energy? \\
+  For what distribution is the Helmholtz free energy maximized (called the Gibbs free energy)?  How does this relate to the maximum entropy distribution?
 \end{problem}
 
 \section{Probabilistic Graphical Models}
@@ -339,6 +355,8 @@ Expectation Propagation
 \end{problem}
 
 \section{Exponential families and convex optimization duality}
+
+This section is focuses on a convex optimization perspective of exponential families and can be skipped.  It is still under construction.
 
 The convex conjugate / Fenchel transform / Legendre-Fenchel transform is the function to a (potentially non-convex) function.
 
@@ -453,7 +471,6 @@ Dynamic Bayesian Networks
 \end{problem}
 
 
-\section{Information Theory, Free energy, Bregman Divergence}
 
 \end{document}
 
