@@ -15,24 +15,27 @@
 
 
 $X$ random variable \\ 
-$x$ instantiation/sample of the random variable $X$ \\
+$x$ instantiation of the random variable $X$ \\
+$X_n$ sample of the random variable $X$ \\
 $u(X_1, \ldots, X_N)$ sufficient statistic \\
-$\theta$ parameterization of the distribution \\
+$P$ the probability density function \\
+$\theta$ parameterization of the distribution, generally denoted $P(x; \theta)$ in traditional statistics and $P(x \vert \theta)$ in Bayesian statistics \\
 $\eta$ natural parameter \\
-$Z(\eta)$ normalization factor \\
+$Z(\eta)$ normalization factor of the unnormalized distribution\\
 $g(\eta)$ inverse normalizer \\
 $h(x)$ intrinsic/carrier measure
+$ \left< \cdot, \cdot \right>$ inner product, assumed to be the dot product unless otherwise stated
 
 \section{Pitman-Koopman-Dermois Theorem}
 
-Suppose a sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_n) $.  Furthermore assume it is a minimal sufficient statistic, which means mathematically there exists a mapping from any other sufficient statistic to $u$.
+Suppose a sufficient statistic is additive: $ u(X_1,\ldots,X_N) = \sum_{n=1}^N u(X_n) $.  Furthermore, assume it is a minimal sufficient statistic, which means mathematically there exists a mapping $f$ from any other sufficient statistic to $u$.
 
 \begin{equation}
-  f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N) )
+  f( u'(X_1,\ldots,X_N) ) = u(X_1,\ldots,X_N)
   \label{}
 \end{equation}
 
-Then we can express parametrize the distribution by the natural parameters, $\eta$, such that
+Then we can parametrize the distribution by the natural parameters, $\eta$, such that
 
 \begin{equation}
   P( x \vert \eta) = g(\eta) h(x) e^{ \left< u(x), \eta \right>}
@@ -65,13 +68,14 @@ The following are two more complicated distributions.  Challenge yourself to see
   The Weibull distribution has the cumulative distribution function
   \begin{equation}
     P( X \leq x \vert \lambda, k ) = \begin{cases}
-      1-e^{-\frac{x}{\lambda}^k} &, x \geq 0 \\
+      1-e^{-\left( \frac{x}{\lambda} \right)^k} &, x \geq 0 \\
       0 &, x <0
     \end{cases}
     \label{}
   \end{equation}
 
-Express the Weibull distribution as an exponential family, with a sufficient statistic and natural parameters.
+Express the Weibull distribution as an exponential family distribution (assume $k$ is fixed), with a sufficient statistic and natural parameters.  \\
+Can we express it as an exponential family distribution it if $k$ is considered to be a parameter?
 \end{problem}
 
 \begin{problem}
@@ -83,7 +87,7 @@ Express the Weibull distribution as an exponential family, with a sufficient sta
     \end{split}
     \label{Gumbel}
   \end{equation}
-Is it an exponential family?  If so, find a minimal sufficient statistic and natural parameters.
+Is it an exponential family, and what assumptions do we have to make, if any?  If so, find a minimal sufficient statistic and natural parameters.
 \end{problem}
 
 The following are more conceptual questions.
@@ -117,6 +121,7 @@ where $h(x)$,$f_\theta$ are non-negative functions.
 
 This is a more advanced, theoretical section (as in you may want to skip this for later), which is meant to solidify our understanding of the mysterious concept of sufficiency.  An understanding of this is important for ideas about perfect and imperfect data reduction, such as Tishby's Information Bottleneck. \\
 
+
 One explanation of a sufficient statistic is that it contains all relevant information about observations for inferring the parametrization.  We wish to understand what this means.
 
 \begin{problem}
@@ -125,24 +130,19 @@ What do we need to specify beforehand before we can define a sufficient statisti
 \end{problem}
 
 \begin{problem}
-  Suppose we have two sets of samples of size $N$, $\{x_1,\ldots,x_N\},\{x_1',\ldots,x_N'\}$ from a normal distribution $\mathcal{N}( \mu, \sigma^2 )$, where $\sigma^2$ is known but $\mu$ is unknown.  \\
-  Further suppose that we have a normal prior, $P(\mu) = \mathcal{N}(0,1)$.  \\
+  Suppose we have two sets of samples of size $N$, $\{x_1,\ldots,x_N\},\{x_1',\ldots,x_N'\}$ \footnote{A note on a change of notation, we will use lowercase $x_n$ for samples instead of capital $X_n$.  This is because we define our sufficient statistic through functions defined on the instantiations of the samples of the random variable.} from a normal distribution $\mathcal{N}( \mu, \sigma^2 )$, where $\sigma^2$ is known but $\mu$ is unknown.  \\
+  Furthermore, suppose that we have a normal prior, $P(\mu) = \mathcal{N}(0,1)$.  \\
   The sufficient statistic is the sum of the samples, so 
 \begin{equation}
   \begin{split}
-    u(x_1,\ldots,x_N) = \sum_n x_n \\
-    = u(x_1',\ldots,x_N') = \sum_n x_n' \\
+    u(x_1,\ldots,x_N) = \sum_{n=1}^N x_n \\
+    = \sum_{n=1}^N x_n' = u(x_1',\ldots,x_N') \\
   \end{split}
   \label{}
 \end{equation}
-Is it true that we assume equal posterior probabilities?
+Suppose the sufficient statistic is the same, $u(x_1,\ldots,x_N) = u(x'_1,\ldots,x'_N) = C$.  How do the posteriors compare?
 \begin{equation}
-  P( \mu = 1 \vert x_1,\ldots,x_N ) = P( \mu = 2 \vert x_1', \ldots, x_N')
-  \label{}
-\end{equation}
-Suppose the sufficient statistic is the same.  How do the posteriors compare?
-\begin{equation}
-  P( \mu = 1 \vert x_1,\ldots,x_N, u(x_1,\ldots,x_N) = C ) = P( \mu = 2 \vert x_1',\ldots,x_N', u(x_1',\ldots,x_N') = C ) ?
+  P( \mu \vert x_1,\ldots,x_N, u(x_1,\ldots,x_N) = C ) = P( \mu \vert x_1',\ldots,x_N', u(x_1',\ldots,x_N') = C ) ?
   \label{}
 \end{equation}
 
@@ -155,8 +155,8 @@ Suppose $u(x_1,\ldots,x_N) = u(x_1',\ldots,x_N')$.  Can you find an example wher
 \end{problem}
 
 \begin{problem}
-  Suppose now that we now have two gaussian distributions with the same variance, $\mathcal{N}(-1,1)$ and $\mathcal{N}(1,1)$.  We pick with equal probability one of these distributions but without knowing which one, and then we can sample from it repeatedly. \\
-Now we repeatedly to sample this distribution $N$ times, but we reject/discard and resample any samples with $x<0$ (but we always end up with a total of $N$ accepted samples).
+  Suppose now that we now have two gaussian distributions with the same variance but different means, for example, $\mathcal{N}(-1,1)$ and $\mathcal{N}(1,1)$.  We pick with equal probability one of these distributions but without knowing which one, and then we can sample from it repeatedly. \\
+Now we sample this distribution $N$ times, but we procedurally reject/discard and resample any samples with $x<0$,  sot we always end up with a total of $N$ accepted samples.
 
 The sufficient statistic is still the mean (you can try to justify this, though it might be hard).
 
@@ -170,23 +170,23 @@ We can conclude
   \label{}
 \end{equation}
 
-So sufficiency does not mean that given all samples with the same sufficient statistic are equally likely.
+So sufficiency does not mean that all samples with the same sufficient statistic are equally likely.
 
-It does not mean that a sample has the same likelihood regardless of the parametrization (see ancillary statistic).
+It does not mean that a sample has the same likelihood regardless of the parametrization, that is, $ P(x_1,\ldots,x_N \vert \theta) \neq P(x_1,\ldots,x_n \vert \theta')$ (see ancillary statistic).
 
 It does mean that the likelihood ratio of two samples with the same sufficient statistic is the same no matter what the parametrization:
 
 \begin{equation}
-  \frac{\prod_n P(x_n \vert \theta) }{ \prod_n P( x_n' \vert \theta) } = \frac{\prod_n P( x_n \vert \theta') }{ \prod_n P( x_n' \vert \theta') }
+  \frac{\prod_{n=1}^N P(x_n \vert \theta) }{ \prod_{n=1}^N P( x_n' \vert \theta) } = \frac{\prod_{n=1}^N P( x_n \vert \theta') }{ \prod_{n=1}^N P( x_n' \vert \theta') }
   \label{}
 \end{equation}
 
-That is, $P( x_1, \ldots, x_N \vert u(x_1, \ldots, x_N) \perp \theta $.
+That is, $X_1, \ldots, X_N \perp \theta \vert u(X_1, \ldots, X_N) $.
 
 It also means that 
 
 \begin{equation}
-  \frac{\prod_n P(x_n \vert \theta) }{ \prod_n P( x_n \vert \theta') } = \frac{\prod_n P( x_n' \vert \theta) }{ \prod_n P( x_n' \vert \theta') }
+  \frac{\prod_{n=1}^N P(x_n \vert \theta) }{ \prod_{n=1}^N P( x_n \vert \theta') } = \frac{\prod_{n=1}^N P( x_n' \vert \theta) }{ \prod_{n=1}^N P( x_n' \vert \theta') }
   \label{}
 \end{equation}
 
@@ -195,10 +195,10 @@ Explain what this equation means in terms of inferring the parameters given the 
 \end{problem}
 
 \begin{problem}
-Assuming the above, prove the Fisher-Neyman factorization theorem.
+Assuming the above, prove the Fisher-Neyman factorization theorem
 
 \begin{equation}
-  p(x \vert \theta) = h(x) f_\theta( u(x) )
+  P(x \vert \theta) = h(x) f_\theta( u(x) )
   \label{Fisher-Neyman factorization theorem}
 \end{equation}
 
@@ -206,7 +206,7 @@ where $h(x)$,$f_\theta$ are non-negative functions.
 \end{problem}
 
 \begin{problem}
-Draw a (graphical) relationship between a sample, $\mathcal{D} = X_1,\ldots,X_N)$, the sufficient statistic $u(x_1, \ldots, x_N)$, and the parametrization, $\theta$. 
+Draw a (graphical) relationship between a sample, $\mathcal{D} = X_1,\ldots,X_N$, the sufficient statistic $u(x_1, \ldots, x_N)$, and the parametrization, $\theta$. 
 Use a double forward arrow to indicate deterministic relationships.
 \end{problem}
 
@@ -218,43 +218,62 @@ Use a double forward arrow to indicate deterministic relationships.
 The first three problems are very fundamental to exponential families and machine learning, and have some level of progression.
 
 \begin{problem}
-Derive an expression for $ \nabla_\eta \log Z(\eta) $ (Hint: in terms of the sufficient statistics). \\
+Derive an expression for $ \nabla_\eta \log Z(\eta) $ (Hint: in terms of the sufficient statistics or expectations of sufficient statistics). \\
 Derive an expression for $ \nabla_\eta \log Z(\eta) $ from the fact that $ \int P( x \vert \eta) dx = 1 $.
 \end{problem}
 
 \begin{problem}
-Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $ in terms of the sufficient statistics.
+Derive an expression for $ \nabla_\eta \nabla_\eta \log Z(\eta) $, the Hessian of the log normalizer, in terms of the expected sufficient statistics.
 \end{problem}
 
 \begin{problem}
 Derive an expression for $ \nabla_\eta \log P( x \vert \eta ) $ in terms of the expected sufficient statistic. \\
-Suppose we have samples $\left\{ X_1, \ldots, X_N \right\}$ from a data distribution $P_{data}(X)$. We can define an empirical distribution, $ P_{emp}(X) = \frac{1}{N} \sum_{n=1}^N \delta(X = X_n) $.  \\
+Suppose we have samples $\left\{ X_1, \ldots, X_N \right\}$ from a data distribution, $P_{data}(X)$. We can define an empirical distribution by the mean of $N$ dirac delta functions, $ P_{emp}(X) = \frac{1}{N} \sum_{n=1}^N \delta(X = X_n) $. \footnote{The dirac delta function is a generalized function, which can be interpreted as a point mass: $ \int f(x) \delta( x = x_n) dx = f(x_n)$}. \\
 Derive an expression for
 
 \begin{equation}
-  \nabla_\eta KL\left( P_{emp}(X) \Vert P( X \vert \eta) \right) = \nabla_\eta \int P_{emp}(X) \log \frac{P_{emp}(X)}{P( X \vert \eta) } dX
+  \nabla_\eta KL\left( P_{emp}(X) \Vert P( X \vert \eta) \right) 
+  \label{}
+\end{equation},
+where
+\begin{equation}
+  KL\left( P_{emp}(X) \Vert P( X \vert \eta) \right) = \int P_{emp}(x) \log \frac{P_{emp}(x)}{P( x \vert \eta) } dx
   \label{}
 \end{equation}
+Hint: What is $ \nabla_\eta \int P_{emp}(x) \log P_{emp}(x) dx$? \\
+Hint: Assume gradients commute with integration and addition, since they are linear operators.
 \end{problem}
 
 \subsection{Discriminative Modeling}
 The next three problems are increasingly more complex versions of the same problem.  Choose one.
 
+Assume we are maximizing log likelihood, although we would like a more information theoretic justification.  \\
+
+A notational note, $X$ may now be a random vector of $K$ random variables, $X_1,\ldots,X_K$. \\
+We can either denote samples of $X,Y$ as $\{X_1^n,\ldots,X_K^n,Y^n\}_{n=1}^N$, which is often notationally simplified into a matrix form, $\{X_{n1},\ldots,X_{nK},Y_n\}_{n=1}^N$.
+
 \begin{problem}
-  Suppose we have online samples of a Bernoulli distribution with an unknown probability.  Derive a first-order and Newton's method second-order gradient-based update of the distribution parameters.
+  Suppose we have online samples $X^n$ of a Bernoulli distribution, $X \in \{0,1\}$, with an unknown probability $P(X = 1) = p$.  Derive an online first-order and Newton's method/second-order gradient-based update of the natural parameter of the Bernoulli distribution.
 \end{problem}
 
 \begin{problem}
-  Suppose we have a online samples ${(X,Y)}$ for a logistic regression model
+  Suppose we have a online samples ${X,Y \sim P_{data}(X,Y)}$, with $X \in R^K$, $Y \in \{0,1\}$.  We model it with a logistic regression model, with weights $W = \{w_1,\ldots,w_k\}$. \\
+  Show that our conditional Bernoulli distribution is equivalent to
   \begin{equation}
-    P( Y \vert X, W) = \sigma( \sum_k w_k X_k )
+    P( Y = 1 \vert X, W) = \sigma( \sum_k w_k X_k )
     \label{logistic}
   \end{equation}
-  Derive a first order and second order gradient-based update for the parameters $W$.
+  What is the relationship between this equation and the exponential family canonical link function relationship, $E_{ Y \sim P(Y \vert \eta) } \left[ u(Y) \right] = \nabla_\eta \log Z(\eta) $. \\
+  How would we model $Y$ with a single Bernoulli distribution?  What happens to $X$ in that model? \\
+  What would we have to do in order to optimize each of the conditional distributions independently? \\
+  We tie these conditional distributions with a single weight vector, $W$.  We could simply assume every data point has an equal gradient update contribution. \\
+  Derive a first order and second order gradient-based update for the parameters $W$. \\
+  We showed before that optimizing a log likelihood objective is equivalent to optimizing $KL\left( P_{emp}(X) \Vert P_{model}(X) \right)$, for a non-conditional distribution.  How can we interpret our conditional log likelihood objective as a KL-divergence?
 \end{problem}
 
 \begin{problem} Generalized Linear Models (GLM) \\
-  Derive a gradient update for $P_W( Y \vert X) \in Poisson(\lambda) $, where $\eta = \sum_k w_k X_k )$.
+  Derive a gradient update $\nabla_W \mathcal{L}\left( \mathcal{D} \right)$, with a negative log likelihood loss function, $\mathcal{L}(\mathcal{D}) = \frac{\sum_{n=1}^N \log P_W(Y^n \vert X^n) }{N}$, with a discriminative model $ Y \vert X, W \in Poisson(\lambda) $, where the natural parameter of the Poisson distribution is $\eta = \sum_k w_k X_k$. \\
+  How can we interpret our objective as a KL-divergence?
 \end{problem}
 
 \subsection{Convex Analysis}
@@ -262,7 +281,7 @@ The next three problems are increasingly more complex versions of the same probl
 The next two problems are more theoretical and are optional if you're not overly concerned about convex analysis.
 \begin{problem}
 Prove that $ \log Z(\eta)$ is a convex function. 
-(Hint: use results from the above problem)  \\
+(Hint: use results from the above gradients problem)  \\
 Prove that the domain of natural parameters is convex.  \\
 Assuming that the covariance of the sufficient statistic is positive definite ( equivalently, that the variance constrained along any vector is positive), prove that there is a one-to-one relationship between $\eta$ and the expected sufficient statistic.
 \end{problem}
@@ -274,13 +293,13 @@ Assuming the above, prove the canonical link function, $f( E_{ x \sim P( x \vert
 \subsection{KL divergence, M-projections, and I-projections}
 
 \begin{equation}
-  KL \left( P(X) \Vert Q(X) \right) := \int P(X) \log \frac{P(X)}{Q(X)} dX
+  KL \left( P(X) \Vert Q(X) \right) := \int P(x) \log \frac{P(x)}{Q(x)} dx
   \label{KL}
 \end{equation}
 
 \begin{problem}
+What is $ KL\left( \mathcal{N} \left( \mu_1,\Sigma_1 \right) \Vert \mathcal{N} \left( \mu_2, \Sigma_2 \right) \right) $ ? \\
 Derive a simplified expression for $ KL\left( P( x \vert \eta') \Vert P( x \vert \eta) \right)$ in terms of the natural parameters and expected sufficient statistics.  \\
-What is $ KL\left( \mathcal{N} \left( \mu_1,\Sigma_1 \right) \Vert \mathcal{N} \left( \mu_2, \Sigma_2 \right) \right) $ ?
 \end{problem}
 
 \begin{problem}
@@ -294,7 +313,7 @@ What is
 Using gradients / derivatives or the previous problem, derive a condition for the M-projection:
 
 \begin{equation}
-  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(X) \log \frac{ P_{data}(X) }{ P( X \vert \eta) } dX
+  \text{argmin}_\eta KL \left( P_{data}(X) \Vert P( X \vert \eta) \right) = \text{argmin}_\eta \int P_{data}(x) \log \frac{ P_{data}(x) }{ P( x \vert \eta) } dx
   \label{}
 \end{equation}
 \end{problem}
@@ -314,8 +333,8 @@ The first part of this problem is about the ``other'' KL divergence, which is us
     \text{argmin}_{Q(X) \in \mathcal{Q}} KL \left( Q(X) \Vert P( X \vert \eta) \right)
     \label{I-projection}
   \end{equation}
-  Assuming $P(X \vert \eta) = g(\eta) e^{\left< u(X), \eta \right> }$, expand the expression for $KL\left( Q(X) \Vert P( X \vert \eta) \right)$ in terms of the entropy of $Q(X)$ and other terms. \\
-  For a Boltzmann distribution, the sufficient statistic $u(X) := -\epsilon(X)$ is the negative energy function, $\eta := \frac{1}{T}$ is the inverse temperature, and we use $Z(\eta) = \frac{1}{g(\eta)}$.  Write out $KL \left( Q(X) \Vert P(X \vert \eta) \right)$, and use the fact that it is non-negative to write out an inequality for $- T \log Z(\eta)$. \\
+  Assuming $P(x \vert \eta) = g(\eta) e^{\left< u(x), \eta \right> }$, expand the expression for $KL\left( Q(X) \Vert P( X \vert \eta) \right)$ in terms of the entropy of $Q(X)$ and other terms. \\
+  For a Boltzmann distribution, the sufficient statistic $u(x) := -\epsilon(x)$ is the negative energy function, $\eta := \frac{1}{T}$ is the inverse temperature, and we use $Z(\eta) = \frac{1}{g(\eta)}$.  Write out $KL \left( Q(X) \Vert P(X \vert \eta) \right)$, and use the fact that it is non-negative to write out an inequality for $- T \log Z(\eta)$. \\
   This is called the Helmholtz free energy.  When the expected energy is constrained to be constant, how does the entropy of $Q(X)$ compare to the Helmholtz free energy? \\
   For what distribution is the Helmholtz free energy maximized (called the Gibbs free energy)?  How does this relate to the maximum entropy distribution?
 \end{problem}
