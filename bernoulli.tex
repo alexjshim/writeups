@@ -1,0 +1,80 @@
+%        File: bernoulli.tex
+%     Created: Sat Jun 05 06:00 PM 2021 P
+% Last Change: Sat Jun 05 06:00 PM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+\section{Derivation 2 of Bernoulli distributions as an exponential family}
+\indent Let $X$ be your sample space:
+\begin{equation}
+  X \in \{ 'heads', 'tails' \}
+\end{equation}
+
+Let us define a sufficient statistic, and induce the natural parameters.
+
+We define the sufficient statistic by an indicator function
+
+\begin{equation}
+  u(x) = I( x = 'heads' )
+\end{equation}
+
+Note for multinoulli, we can specify indicator functions for $K-1$ classes, and obtain a sufficient statistic vector:
+
+\begin{equation}
+  \begin{split}
+    u_1(x) &= I( x = 'cat' ) \\
+    u_2(x) &= I( x = 'dog' ) \\
+    u_3(x) &= I( x = 'hippo' ) \\
+    \cdots
+  \end{split}
+\end{equation}
+
+Now we define our intrinsic measure to restrict our samples to our discrete set of samples:
+
+\begin{equation}
+  h(x) = \begin{cases} 1\footnote{technically we would use a delta function $\delta(x = 'heads') + \delta(x = 'tails')$ for a continuous space} \quad x = 'heads' \, or \, x = 'tails' \\ 0 \quad \text{otherwise} \end{cases}
+\end{equation}
+
+The partition/normalization function can be calculated by integration/summing over X
+
+\begin{equation}
+  \begin{split}
+    Z( \eta ) &= \sum_X e^{ u(x) \cdot \eta } \\
+    &= e^{ 0 \cdot \eta } + e^{ 1 \cdot \eta} \\
+    &= 1 + e^\eta
+  \end{split}
+\end{equation}
+
+We know for exponential families
+
+\begin{equation}
+  \nabla_\eta \log Z(\eta) = E_{ x \sim p( x \vert \eta ) } \left[ u(x) \right]
+\end{equation}
+
+Using calculus to simplify the left side
+
+\begin{equation}
+  \begin{split}
+    \frac{ d} { d \eta} \log ( 1 + e^\eta) &= \frac{ e^\eta }{ 1+ e^\eta } \\
+    &= \sigma(\eta)
+  \end{split}
+\end{equation}
+
+The right side is a sufficient statistic of the indicator function for heads
+
+\begin{equation}
+  E_{ x \sim p( x \vert \eta ) } \left[ I(x = 'heads' ) \right] = Pr\left( X = 'heads' \right)
+\end{equation}
+
+Thus, we have usual relation for bernoulli that we use for logistic regression
+
+\begin{equation}
+  Pr\left( X = 'heads' \right) = \sigma(\eta)
+\end{equation}
+\end{document}
+
+
