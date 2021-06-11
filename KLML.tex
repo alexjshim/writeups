@@ -1,0 +1,67 @@
+%        File: KLML.tex
+%     Created: Fri Jun 11 03:00 PM 2021 P
+% Last Change: Fri Jun 11 03:00 PM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+\section{Maximum log likelihood is minimizing KL divergence}
+
+In statistics and machine learning, we often try to maximize probability or log likelihood
+
+\begin{equation}
+  \arg\max_w \prod_{n=1}^N p( x_n \vert w) = \arg\max_w \sum_{n=1}^N \log p( x_n \vert w )
+  \label{}
+\end{equation}
+
+We show that this is equivalent to $ \arg \min_w KL\left( p_{data}(x) \Vert p(x \vert w \right) $, when the samples are drawn iid from $p_{data}(x)$:
+
+\begin{equation}
+  KL( p_{data}(x) \Vert p(x \vert w ) = - H\left( p_{data}(x) \right) - E_{ x \sim P_{data}(x) } \left[ \log p( x \vert w) \right]
+  \label{}
+\end{equation}
+
+The entropy of $p_{data}(x)$ is unaffected by $w$, so it is unaffected by the minimization. Hence minimizing KL is the same as minimizing the cross entropy.
+
+One useful property is that we can use samples to estimate the cross-entropy, without having to know the explicit probability distribution of $p_{data}(x)$. Other divergence measures may not be so direct.
+
+We use Monte Carlo estimation to estimate the cross-entropy.
+
+\begin{equation}
+  \frac{1}{N} \sum_{n=1}^N \log p(x_n \vert w) \rightarrow E_{ x \sim p_{data}(x)} \left[ \log p(x \vert w) \right]
+  \label{}
+\end{equation}
+
+This justified in statistics literature by the weak law of large numbers, and there is an almost identical proof of the Asymptotic Equipartition Property (AEP) theorem, given in Chapter 3 of Cover and Thomas.
+
+Therefore, maximizing log likelihood is equivalent to minimizing KL divergence to the class of distributions parametrized by $w$
+
+\begin{equation}
+  \arg \min_w KL \left( p_{data}(x) \Vert p(x \vert w) \right) \approx \arg \min_w - \frac{1}{N} \sum_{n=1}^N \log p(x_n \vert w)
+  \label{}
+\end{equation}
+
+\subsection{Maximum likelihood with exponential families}
+
+From a previous problem, we showed that $\nabla_\eta \log p(x \vert \eta) = u(x) - E_{ x \sim p( x \vert \eta) } \left[ u(x) \right]$
+
+Hence if we perform a gradient update on the maximum log likelihood / KL minimization objective over a minibatch, we get
+
+\begin{equation}
+  \begin{split}
+    \nabla_\eta KL\left( p_{data}(x) \Vert p( x \vert \eta \right) &\approx - \nabla_\eta \frac{1}{N} \sum_{n=1}^N \log p(x_n \vert \eta) \\
+    &= - \frac{1}{N} \sum_{n=1}^N \left( u(x_n) - E_{ x \sim p(x \vert \eta)} \left[ u(x) \right] \right) \\
+    &= - \left( \frac{\sum_{n=1}^N u(x_n)}{N} - E_{ x \sim p(x \vert \eta)} \left[ u(x) \right] \right) \\
+    &= - \left( E_{ x \sim p_{emp}(x)} \left[ u(x) \right] - E_{ x \sim p( x \vert \eta)} \left[ u(x) \right] \right)
+  \end{split}
+  \label{}
+\end{equation}
+
+Hence for arbitrary exponential families, we can express both maximum gradient updates and KL minimization gradient updates as residuals.
+
+\end{document}
+
+
