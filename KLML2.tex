@@ -1,0 +1,104 @@
+%        File: KLML2.tex
+%     Created: Fri Jun 11 03:00 PM 2021 P
+% Last Change: Fri Jun 11 03:00 PM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+We are interested in interpreting models like regression or logistic regression, where we minimize
+
+\begin{equation}
+  \frac{1}{N} \sum_{n=1}^N \lVert t_n - ( w^\intercal x_n + b) \rVert^2
+  \label{}
+\end{equation}
+
+or for logistic regression
+
+\begin{equation}
+  \frac{1}{N} \log p(y_n \vert x_n, w)
+  \label{}
+\end{equation}
+
+For regression, we note that this is equivalent to the likelihood of a linear Gaussian distribution, $ t_n \sim \mathcal{N} \left( w^\intercal x_n + b, \sigma^2 \right)$, which has a likelihood of
+
+\begin{equation}
+  \frac{1}{\sqrt{ 2 \pi} } \frac{1}{\sigma} e^{ - \frac{1}{2} \frac{\lVert t_n - \left( w^\intercal x_n + b \right) \rVert^2 }{ \sigma^2} }
+  \label{}
+\end{equation}
+
+and a log likelihood of
+
+\begin{equation}
+  \begin{split}
+    \frac{1}{N} \sum_{n=1}^N \left( - \frac{\lVert t_n - \left( w^\intercal x_n + b \right)\rVert^2}{2 \sigma^2} - \frac{1}{2} \log ( 2 \pi \sigma^2) \right) \\
+    = - \frac{1}{2} \log ( 2 \pi \sigma^2 ) - \frac{1}{2 \sigma^2} \frac{1}{N} \sum_{n=1}^N \lVert t_n - \left( w^\intercal x_n + b \right) \rVert^2
+  \end{split}
+  \label{regression}
+\end{equation}
+
+which is regression with constant scaling and a constant offset, neither of which is affected by the parameters $w,b$.
+
+Knowing that we are once again maximizing log likelihood, we will extend our result that maximum likelihood is the same as KL minimization, to conditional distributions / discriminative models.
+
+\begin{equation}
+  \arg \min_w KL\left( p_{data}(y \vert x) \Vert p( y \vert x, w) \right) \approx \arg \max_w \frac{1}{N} \sum_{n=1}^N \log p(y_n \vert x_n, w)
+  \label{}
+\end{equation}
+
+\section{Information Theory}
+
+$KL\left( p_{data}(y \vert x) \Vert p( y \vert x, w) \right)$ is known as conditional KL or conditional relative entropy.
+
+To be formal, we should define conditional entropy, which involves an outer expectation and an inner conditional expectation
+
+\begin{equation}
+  H( p(y \vert x) = - E_{ x \sim p(x) } \left[ E_{ y \sim p(y \vert x)} \left[ \log p(y \vert x) \right] \right]
+  \label{Conditional Entropy}
+\end{equation}
+
+Conditional KL similarly modifies KL by adding an additional outer expectation
+
+\begin{equation}
+  KL\left( p(y \vert x) \Vert q(y \vert x) \right) = E_{ x \sim p(x)} \left[ E_{y \sim p(y \vert x)} \left[ \log \frac{p( y \vert x)}{q(y \vert x)} \right] \right]
+  \label{Conditional KL}
+\end{equation}
+
+In fact, this is the same as $ KL\left( p(x)p(y \vert x) \Vert p(x) q(y \vert x) \right) $, the KL of the joint if they share the same marginal distribution over $x$.
+
+Like before, we choose $p$ to be our data distribution and $q$ to be our model distribution, which is parameterized by $w$. 
+
+Then minimizing KL is once again minimizing cross entropy
+
+\begin{equation}
+  \arg \min_w KL\left( p_{data}(y \vert x) \Vert p(y \vert x, w) \right) = \arg \min_w - E_{ x \sim p_{data}(x)} \left[ E_{ y \sim p_{data}(y \vert x) } \left[ \log p( y \vert x, w) \right] \right]
+  \label{}
+\end{equation}
+
+Once again we can do Monte Carlo estimation of the cross entropy (which we could also write as an expectation over an empirical distribution), yielding a log likelihood estimator
+
+\begin{equation}
+  \frac{1}{N} \sum_{n=1}^N \log p( y_n \vert x_n, w) \rightarrow E_{ x \sim p_{data}(x)} \left[ E_{ y \sim p_{data}(y \vert x) } \left[ \log p( y \vert x, w) \right] \right]
+  \label{}
+\end{equation}
+
+Therefore maximizing log likelihood for a discriminative model is equivalent to minimizing conditional KL.
+
+\section{Gradient updates for linear regression / generalized linear models}
+
+If we wanted to perform gradient updates on the weights, we could use the chain rule on our previous result about the gradient of the log likelihood with respect to natural parameters, noting that $\eta(x_n,w,b) = w^\intercal x_n + b$
+
+\begin{equation}
+  \begin{split}
+    \nabla_w \log p( y_n \vert x_n, w) &= \nabla_{\eta} \log p( y_n \vert \eta(x_n,w,b)) \cdot \nabla_w \eta(x_n,w,b) \\
+    &= \left( y_n - E_{ y \sim p( y \vert \eta(x_n,w,b))} \left[ y \right] \right) \cdot w
+  \end{split}
+  \label{}
+\end{equation}
+
+
+\end{document}
+
+
