@@ -1,0 +1,385 @@
+%        File: CompleteTheSquare.tex
+%     Created: Sat Jun 12 05:00 AM 2021 P
+% Last Change: Sat Jun 12 05:00 AM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath,amssymb}
+
+\begin{document}
+
+We are going to get into the mathematical principles behind completing the square, calculating conditional Gaussians, and Bayesian posterior calculation for linear Gaussian likelihoods. 
+
+There are two technical points, 1) a probability density function with linear and quadratic terms collecting in the exponent yields a (unnormalized) Gaussian distribution, and 2) once we collect the linear and quadratic terms of a certain variable we can analytically integrate out those terms.
+
+\section{The natural parameter and information form of a Gaussian}
+
+  We derive the natural parameter form for a Gaussian and relate it to the completing the square form.
+
+  Going back to my alternative derivation of a Bernoulli, we can define an exponential family by defining the sufficient statistics and the intrinsic measure, $h(x)$.
+
+  It turns out we can treat the intrinsic measure as $h(x) = 1$, and the sufficient statistic vector as $u_1(x) = x x^\intercal$ and $u_2(x) = x$.
+
+  We can write the unnormalized probability distribution as $ \tilde{p}(x \vert \eta_1,\eta_2) = h(x) e^{ \left< x x^\intercal, \eta_1 \right> + x^\intercal \eta_2 }$.
+This means that when we see an unnormalized probability distribution written in terms of the quadratic term and linear term, it is close to the natural parameter form of a gaussian distribution.
+
+We perform a more detailed derivation of the natural parameters in terms of the mean, $\mu$, and the covariance, $\Sigma$.
+
+We know that probability density functions integrate out to 1, which is equivalent to defining the normalization/partition function for the unnormalized distribution.
+
+  \begin{equation}
+    Z(\eta) := \int h(x) e^{u(x)^\intercal \eta} dx
+    \label{}
+  \end{equation}
+
+  For Gaussian distributions, we can rewrite the probability density in exponential family form
+
+\begin{equation}
+  p(x; \mu,\Sigma) = 
+    \frac{1}{\left( 2 \pi \right) ^{ - \frac{D}{2} } } 
+    \frac{1}{\lvert \Sigma \rvert ^{ \frac{1}{2} } } 
+    e^{ 
+      - \frac{1}{2} \left( x - \mu \right)^\intercal 
+      \Sigma^{-1}
+      \left( x - \mu \right) 
+    }
+  \label{Gaussian}
+\end{equation}
+
+Choosing $u_1(x) = x x^\intercal$ and $u_2(x) = x$, we can collect the terms inside the exponential into quadratic, linear, and constant terms
+
+\begin{equation}
+  \begin{split}
+    p( x; \mu, \Sigma) &= 
+      \frac{1}{\left( 2 \pi \right) ^{ - \frac{D}{2} } }
+      \frac{1}{\lvert \Sigma \rvert ^{ \frac{1}{2} } }
+      e^{ 
+        - \frac{1}{2} x^\intercal \Sigma^{-1} x
+        + \frac{1}{2} x^\intercal \Sigma^{-1} \mu
+        + \frac{1}{2} \mu^\intercal \Sigma^{-1} x
+        - \frac{1}{2} \mu^\intercal \Sigma^{-1} \mu 
+      } \\
+    &= 
+      \frac{1}{\left( 2 \pi \right) ^{ - \frac{D}{2} } }
+      \frac{1}{\lvert \Sigma \rvert ^{ \frac{1}{2} } } 
+      e^{ 
+	- \frac{1}{2} \mu^\intercal \Sigma^{-1} \mu 
+      } 
+      e^{ 
+	\left< x x^\intercal, - \frac{\Sigma^{-1}}{2} \right>
+	+ \left< x, \Sigma^{-1} \mu \right> 
+      } 
+  \end{split}
+  \label{}
+\end{equation}
+
+where in the second line we have used fact that $\Sigma$ and $\Sigma^{-1}$ are symmetric.
+
+Then we see that our natural parameters are 
+$\eta_1 = - \frac{ \Sigma^{-1} }{ 2 }$
+and
+$\eta_2 = \Sigma^{-1} \mu$
+, and our normalization function is
+\begin{equation}
+  \begin{split}
+    Z(\mu,\Sigma) &= 
+      \left( 2 \pi \right) ^ { \frac{D}{2} }
+      \det \Sigma ^{ \frac{1}{2} } 
+      e^{ \frac{ \mu^\intercal \Sigma^{-1} \mu }{ 2 } } \\
+    Z( \eta_1,\eta_2) &= 
+      \left( 2 \pi \right) ^{\frac{D}{2}} 
+      \det ( - 2 \eta_1 )^{- \frac{1}{2} } 
+      e^{ \frac{ \eta_2^\intercal ( - 2 \eta_1) ^{-1} \eta_2 }{2} }
+  \end{split}
+  \label{}
+\end{equation}
+
+This is a little unwieldy, so instead we can slightly modify the natural parameter form of a Gaussian to the information form (see Koller, Chapter 7, Gaussian Network Models), which is written in terms of the precision matrix, $\Lambda = \Sigma^{-1}$, and the mean.
+
+\begin{equation}
+  \tilde{p(x)} = 
+    e^{
+      \left< x x^\intercal, \frac{\Lambda}{2} \right>
+      + \left< x, \Lambda \mu \right>
+    }
+  \label{Information form}
+\end{equation}
+
+Then we can write the normalization constant as
+
+\begin{equation}
+  Z(\mu,\Lambda) = 
+  \left( 2 \pi \right)^{ \frac{D}{2} }
+  \det \Lambda^{ - \frac{1}{2} }
+  e^{
+    \left< \mu \mu^\intercal, \frac{\Lambda}{2} \right>
+  }
+  \label{}
+\end{equation}
+
+and this lines up very well with our completing the square math.
+
+\subsection{Matrix dot products}
+
+  We have rewritten our quadratic forms as a dot product between the matrix and an outer product of the two vectors, and here we justify this. 
+The benefit of this matrix dot products form is that dot products are bilinear, allowing us to collect quadratic terms together:
+
+\begin{equation}
+  \left< M_1, x x^\intercal \right> + \left< M_2, x x^\intercal \right> = \left< M_1 + M_2, x x^\intercal \right>
+\end{equation}
+
+  To start, we observe what happens if we define a dot product between two matrices by vectorizing each matrix and then taking the dot product
+
+\begin{equation}
+  \left< A, B \right> = \sum_{i,j} A_{ij} B_{ij}
+  \label{}
+\end{equation}
+
+  We can do something similar using matrix multiplication, though in order to multiply the $j_1$th column of $A$ with $j_2$th column of $B$, we need to take the transpose of the $j_1$th column of $A$
+
+\begin{equation}
+  \begin{split}
+    \left< A_{\cdot j_1} B_{ \cdot j_2 } \right> &= 
+      A_{ \cdot j_1} ^\intercal
+      B_{ \cdot j_2} \\
+      &= \sum_i A_{i,j_1} B_{i,j_2}
+  \end{split}
+  \label{}
+\end{equation}
+
+  We can break matrix dot product into two nested summations
+
+\begin{equation}
+  \begin{split}
+    \left< A, B \right> &= 
+      \sum_j \sum_i A_{ij} B_{ij} \\
+      &= \sum_j
+        A_{ \cdot j} ^ \intercal
+	B_{ \cdot j}
+  \end{split}
+  \label{}
+\end{equation}
+
+  If we were to do a full matrix multiplication $ A^\intercal B $, we note that the $ij$-th entry of the result is $ A_{ \cdot i}^\intercal B_{ \cdot j}$. But we only are interested in the terms where $i = j$, that is the diagonal terms, and we want to sum them up.
+
+  The sum of the diagonal terms is defined exactly as the trace, so
+
+\begin{equation}
+  \left< A, B \right> = 
+    \text{tr} \left( A^\intercal B \right)
+  \label{}
+\end{equation}
+
+Next we show that the quadratic form $ x^\intercal M x$ can be written as $ \left< M, x x^\intercal \right>$,  the matrix dot product of $M$ and the outer product of $x$ and itself. 
+
+  Intuitively, we can view the $ n \times x $ matrix $M$ as something like a function defined over the product of two discrete spaces of size $n$. 
+If we wanted to evaluate the expectation with respect to some probability distribution $P$ over this joint space, we would simply multiply each term individually and add them together
+
+\begin{equation}
+  \left< P, M \right> = \sum_{i,j} P_{ij} M_{ij}
+  \label{}
+\end{equation}
+
+In the particular case where the marginal probabilities over each axis/discrete space are independent of each other, the joint probability can be written as the outer product of the marginal distributions: $ P = P_I P_J^\intercal$.
+
+Then we can marginalize out each axis separately
+
+\begin{equation}
+  \begin{split}
+    \left< P, M \right> &= 
+      \sum_ i
+        \left( 
+	  \sum_j M_{ij} P_j
+	\right)
+	P_i \\
+    &= P_i^\intercal M P_j
+  \end{split}
+  \label{}
+\end{equation}
+
+  Another way to see this is to note that the quadratic form $1_i^\intercal M 1_j$ is equal to $M_{ij}$, where $1_i$ and $1_j$ are one-hot vectors with 1's at the $i$th and $j$th entry, respectively.
+
+  Then we can view $ x ^\intercal M x$ as
+
+  \begin{equation}
+    \begin{split}
+      x^\intercal M x &=
+        \left( \sum_i x_i 1_i \right)^\intercal
+        M
+        \left( \sum_j x_j 1_j \right) \\
+	&= \sum_{ij} x_i x_j M_{ij} \\
+	&= \left< M, x x^\intercal \right>
+    \end{split}
+    \label{}
+  \end{equation}
+
+\section{Integration using the normalization function}
+
+In particular, we can integrate out our unnormalized $ \tilde{p}(x \vert \eta_1,\eta_2) = e^{ \left< x x^\intercal, \eta_1 \right> + \left< x, \eta_2 \right> } $ by setting it to the partition function
+
+\begin{equation}
+  \begin{split}
+    Z(\mu,\Lambda) &= 
+      \int 
+        e^{ 
+  	\left< x x^\intercal, \eta_1 \right> + \left< x, \eta_2 \right> 
+        } 
+      dx \\
+      &= \left( 2 \pi \right) ^ { \frac{D}{2} }
+      \det \Lambda ^{ -\frac{1}{2} }
+      e^{ 
+        \frac{ \mu^\intercal \Lambda \mu }{ 2 } 
+      }
+    \end{split}
+  \label{Gaussian normalization function}
+\end{equation}
+
+\section{Bayesian linear regression}
+
+With these additional theoretical insights, we are ready to deal with calculating the posterior of a linear Gaussian likelihood.
+
+The steps are to 1) compute the joint probability of the weights and the targets, 2) collect the linear and quadratic terms in the exponent, 3) marginalize out the weights, which turns out to be the same as marginalizing out the posterior distribution, and 3) collecting the remaining linear and quadratic terms in the exponent into a gaussian distribution for the target.
+
+\begin{equation}
+  \begin{split}
+    &p( t \vert x, w, b ) = \mathcal{N} \left( w x + b, \beta^{-1} \right) \\
+    &p( w ) = \mathcal{N} \left( 0, \alpha^{-1} I_{D_w} \right) \\
+    &p( w, t_1, \ldots, t_N \vert x_1, \ldots, x_N ) = p(w) \prod_{n=1}^N p( t_n \vert x_n, w, b)
+  \end{split}
+  \label{}
+\end{equation}
+
+The idea now is that we want to marginalize out $w$, by collecting the linear and quadratic terms of $w$ in the exponent. 
+Unfortunately, the exponential terms involving $w$ also involve $x$ and $t$, so we are not marginalizing out $p(w)$, we are marginalizing out the posterior distribution $p(w \vert x_1,\ldots,x_N,t_1,\ldots,t_N)$
+
+\begin{equation}
+  p(w,t_1,\ldots,t_N \vert x_1,\ldots,x_N) = p( w \vert t_1,\ldots,t_N, x_1,\ldots,x_N) p( t_1,\ldots,t_N \vert x_1,\ldots,t_N)
+  \label{}
+\end{equation}
+
+Our integral over $w$ is integrating the information form of a Gaussian distribution over $w$.
+
+Then we can use our normalization function to evaluate the integral, and we argue that the leftover marginal distribution is once again in the information form of a Gaussian.
+
+\begin{equation}
+  \begin{split}
+    &\int p(w, x_1, \ldots, x_N, t_1, \ldots, t_N) dw = \\ 
+    &\int 
+    Z(\alpha)
+    e^{ - \frac{1}{2} w^\intercal \alpha I_{D_w} w} 
+    \prod_{n=1}^N
+      \left( 2 \pi \right)^{ - \frac{1}{2}}
+      \beta^{ \frac{1}{2} }
+      e^{
+	- \frac{1}{2} 
+	\left( t_n - ( w \cdot x_n + b) \right)^\intercal
+	\beta
+	\left( t_n - ( w \cdot x_n + b) \right)
+	}
+    dw = \\
+    & Z(\alpha) 
+    \left( 2 \pi \right)^{\frac{N}{2}} 
+    \beta^{\frac{N}{2}}
+    \int 
+      e^{ 
+	- \frac{1}{2} w^\intercal \alpha I_{D_w} w
+	- \frac{1}{2} \sum_{n=1}^N t_n^\intercal \beta t_n
+	+ \sum_{n=1}^N t_n^\intercal \beta (w \cdot x_n + b)
+	- \frac{1}{2} \sum_{n=1}^N (w \cdot x_n + b) ^\intercal \beta (w \cdot x_n + b)
+      }
+      dw
+  \end{split}
+  \label{}
+\end{equation}
+
+We're going to drop out the bias term $b$ to make the math simpler - this would be equivalent to centering the data.
+
+We collect the quadratic and linear $w$ terms to put it in information form.
+
+\begin{equation}
+  \begin{split}
+    Z(\alpha) 
+    \left( 2 \pi \right)^{\frac{N}{2}} 
+    \beta^{\frac{N}{2}}
+    \int 
+      e^{ 
+	- \frac{1}{2} \left< w w^\intercal, \alpha I_{D_w} \right>
+	- \frac{1}{2} \sum_{n=1}^N \left< w w^\intercal, \beta x_n x_n^\intercal \right>
+	+ \sum_{n=1}^N \left< w, \beta t_n x_n \right>
+        - \frac{1}{2} \sum_{n=1}^N t_n^\intercal \beta t_n
+      } \\
+      = Z(\alpha) 
+        \left( 2 \pi \right)^{\frac{N}{2}} 
+        \beta^{\frac{N}{2}}
+	e^{
+          - \frac{1}{2} \sum_{n=1}^N t_n^\intercal \beta t_n
+	}
+        \int
+	  e^{
+	    - \frac{1}{2} \left< w w^\intercal, \alpha I_{D_w} + \beta \sum_{n=1}^N x_n x_n^\intercal \right>
+	    + \left< w, \beta \sum_{n=1}^N t_n x_n \right>
+	  }
+	dw
+  \end{split}
+  \label{}
+\end{equation}
+
+Thus the term inside the integral is equivalent to the normalization function of the unnormalized version of 
+\begin{equation}
+  \mathcal{N} \left(
+  w; 
+  \mu_{w \vert \mathcal{D}} := 
+    \beta \Sigma_{w \vert \mathcal{D} } \sum_{n=1}^N t_n x_n,
+  \Sigma_{w \vert \mathcal{D} } := 
+    \left(
+      \alpha I_{D_w} + \beta \sum_{n=1}^N x_n x_n^\intercal
+    \right) ^{-1}
+  \right)
+  \label{}
+\end{equation}
+
+This distribution is the posterior distribution, $p( w \vert \mathcal{D})$ conditioned on the dataset $\mathcal{D}$. 
+Thus what we are doing by marginalizing out $w$ from the joint is calculating the marginal distribution $p( \mathcal{D} )$, using the posterior distribution.
+
+The remaining terms are
+
+\begin{equation}
+  Z(\alpha) 
+  \left( 2 \pi \right)^{\frac{N}{2}} 
+  \beta^{\frac{N}{2}}
+  e^{
+    - \frac{1}{2} \sum_{n=1}^N t_n^\intercal \beta t_n
+  }
+  \left( 2 \pi \right) ^{- \frac{D}{2} }
+  \det \Sigma_{ w \vert \mathcal{D} }^{\frac{1}{2} }
+  e^{
+    \frac{1}{2}
+    \mu_{w \vert \mathcal{D} }^\intercal
+    \Sigma_{w \vert \mathcal{D} }^{-1}
+    \mu_{w \vert \mathcal{D} }
+  }
+  \label{}
+\end{equation}
+
+We note that in the exponent, everything is a quadratic term in terms of two $t_n$ variables, and we are going to treat this is an unnormalized probability distribution over the vector $t$. 
+In fact if we assume it marginalizes properly, we do not have to pay attention to the outside factors and just focus on the terms inside the exponential
+
+\begin{equation}
+  \begin{split}
+    - \frac{\beta}{2} \sum_{n=1}^N t_n^\intercal t_n
+    + \left( \beta \sum_{n=1}^N t_n x_n \right)^\intercal
+      \Sigma_{ w \vert \mathcal{D} }
+      \left( \beta \sum_{n=1}^N t_n x_n \right) = \\
+      - \frac{\beta}{2} \left< \vec{t} \vec{t}^\intercal, \beta I_N \right>
+      + \beta^2 \vec{t}^\intercal X \Sigma_{ w \vert \mathcal{D} } X^\intercal \vec{t} \\
+      = - \frac{1}{2} \left< \vec{t} \vec{t}^\intercal, \beta I_N - \beta^2 X \Sigma_{ w \vert \mathcal{D} } X^\intercal \right>
+  \end{split}
+  \label{}
+\end{equation}
+
+And finally we can use Woodbury's identity to recover <++>
+
+Therefore, (for centered data), the marginal target distribution has covariance <++> and is from a normal distribution $\mathcal{N} \left( 0, <++> \right) $.
+
+\end{document}
+
+

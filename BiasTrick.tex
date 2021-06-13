@@ -1,0 +1,53 @@
+%        File: BiasTrick.tex
+%     Created: Sat Jun 12 02:00 PM 2021 P
+% Last Change: Sat Jun 12 02:00 PM 2021 P
+%
+\documentclass[a4paper]{article}
+\usepackage[]{amsmath,amssymb}
+
+\begin{document}
+
+In machine learning, we commonly use affine functions, which are linear functions with a bias offset.
+
+\begin{equation}
+  y(\vec{x},w) = w_0 + \sum_{k=1}^K w_k x_k
+  \label{}
+\end{equation}
+
+The right term can be written as a dot product, and we can write the entire function as a dot product of an extended space, with a $1$ in the ``$0$''th dimension:
+
+\begin{equation}
+  y(\vec{x},w) = 
+    \begin{pmatrix}
+      w_0 \\ w_1 \\ \cdots \\ w_K
+    \end{pmatrix}
+    \cdot
+    \begin{pmatrix}
+      1 \\ x_1 \\ \cdots \\ x_K
+     \end{pmatrix}
+  \label{}
+\end{equation}
+
+This allows us to treat the affine function as a dot product, hinting that we can turn an affine function into a linear function.
+
+There is a concept behind this, called the perspective function in convex analysis. This is discussed in Boyd's Convex Optimization, in Chapter 2.3.3, and we adapt their definition and notation.
+
+  We define the perspective function $P: R^{K+1} \rightarrow R^K$, with domain $\textbf{dom} P = R^K \times R_{++}$ as $P(z,t) = \frac{z}{t}$. (Here $R_{++}$ denotes the set of positive numbers: $R_{++} = \left\{ x \in R \vert x > 0 \right\} $. )  The perspective function scales or normalizes vectors so the last component is one, and then drops the last component.
+
+A quick example shows that two vectors in the same direction will map to the same vector. Conceptually, we are turning vectors into rays (as long as the last component is non-zero).
+
+\begin{equation}
+  \begin{split}
+    P\left( (4,2,2) \right) = (2,1) \\
+    P\left( (8,4,4) \right) = (2,1) 
+  \end{split}
+  \label{}
+\end{equation}
+
+So we can view our extended vector $ ( 1, x_1, \ldots, x_K) $ as a image of a perspective function / projection of a $R_{++} \times R^{K}$ dimensional space to a $R^K$ dimensional space, and our affine function is a linear function acting this projected space.
+
+This perspective function turns out to be a pretty important concept in convex analysis, as it helps bridge between linear and affine functions, linear combinations and convex combinations, and when you define graphs as further extensions of the space, we can even connect the duality in convex analysis to duality in functional analysis (though I have a separate writeup for that).
+
+\end{document}
+
+
