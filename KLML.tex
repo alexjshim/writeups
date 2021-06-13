@@ -60,6 +60,26 @@ Hence if we perform a gradient update on the maximum log likelihood / KL minimiz
   \label{}
 \end{equation}
 
+For the last step, we observe that we can compute an average over certain points as a mixture of deterministic distributions, which can be written as a delta function.
+
+\begin{equation}
+  E \left[ f(x) \right] = \int \delta( x = x' ) f(x) dx = f(x')
+  \label{}
+\end{equation}
+
+Then we define our empirical distribution as $p_{emp}(x) = \frac{1}{N} \sum_{n=1}^N \delta( x = x_n) $. 
+
+Then evaluating our expectation
+
+\begin{equation}
+  \begin{split}
+    E_{ x \sim p_{emp}(x) } \left[ u(x) \right] &= \int \frac{1}{N} \sum_{n=1}^N \delta( x = x_n) u(x) dx \\
+    &= \frac{1}{N} \sum_{n=1}^N \int \delta(x = x_n) u(x) dx \\
+    &= \frac{1}{N} \sum_{n=1}^N u(x_n)
+  \end{split}
+  \label{}
+\end{equation}
+
 Hence for arbitrary exponential families, we can express both maximum gradient updates and KL minimization gradient updates as residuals.
 
 \end{document}
