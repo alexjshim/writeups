@@ -98,22 +98,12 @@ Gross violations will trigger corrections at the camera-ready phase.
 \section{Introduction}
 \label{introduction}
 
-Transformers have reached state of the art results in language models, sig-
-nificantly outperforming LSTMs. One conceptual explanation for their in-
-creased performance is the ability of attention to utilize long range dependencies,
-whereas Recurrent Neural Networks were limited by having to encode past infor-
-mation within a fixed size hidden state. What this explanation does not explain
-is how certain architectural choices of transformers, specifically exponential dot
-product attention, also somewhat ambiguously referred to as softmax attention,
-outperforms alternatives.
+Transformers have reached state of the art results in language models, significantly outperforming LSTMs. One conceptual explanation for their increased performance is the ability of attention to utilize long range dependencies, whereas Recurrent Neural Networks were limited by having to encode past information within a fixed size hidden state. 
+What this explanation does not explain is how certain architectural choices of transformers, specifically exponential dot product attention, also somewhat ambiguously referred to as softmax attention, outperforms alternatives.
 
-Exponential dot product attention has been seen before in contrastive learn-
-ing, though often with normalized embeddings before softmax is applied. In
-language models, the softmax probability was used in Word2Vec and later word
-embedding work and for memory networks it was used in Neural Turing Ma-
-chines. Contrastive loss originated as Noisy Contrastive Estimation and contin-
-ues to be used in seminal papers such as SimCLR, which achieved state of the
-art results, as have many variants based off SimCLR.
+Exponential dot product attention has been seen before in contrastive learning, though often with normalized embeddings before softmax is applied. 
+In language models, the softmax probability was used in Word2Vec and later word embedding work and for memory networks it was used in Neural Turing Machines. 
+Contrastive loss originated as Noisy Contrastive Estimation and continues to be used in seminal papers such as SimCLR, which achieved state of the art results, as have many variants based off SimCLR.
 
 The successes of transformers has been verified empirically, but far research
 has focused on a theoretical explanation of transformers perform so well. We
@@ -132,8 +122,26 @@ for future research.
 \section{Related Work}
 \label{related work}
 
-\subsection{Contrastive Learning}
+\section{Exponential Dot Product Attention}
+Word2vec used a skip-gram model to predict neighboring words using a conditional distribution defined by a normalized exponential dot product multinoulli function \cite{DBLP:journals/corr/MikolovSCCD13}
+
+Attention was proposed through normalized exponential alignment functions, often referred to as softmax attention in literature, for Neural Machine Translation \cite{DBLP:journals/corr/Graves13,bahdanau2014neural}, and later work parallelizing computation on sequential data introduced normalized exponential dot product similarity \cite{DBLP:journals/corr/ParikhT0U16} (A Decomposable Attention Model for Natural Language Inference).
+Neural Turing Machines gated memory updates using normalized exponential cosine similarity, in what is referred to as soft attention \cite{DBLP:journals/corr/GravesWD14}.
+
+Other transformer precursors parallelized attention updates over the entire sequence into a layer and switched to convolution-based attention weights \cite{kaiser2016neural,DBLP:journals/corr/KaiserB16}. 
+The transformer architecture incorporated exponential dot product attention scaled by dimensionality \cite{vaswani2017attention}. 
+
+\subsection{Contrastive Learning and Metric learning}
 \label{contrastive}
+Noise-Contrastive Estimation creates a mixture distribution between real data and noisy data to convert an unsupervised learning problem into a semi-supervised learning problem, modeling the distribution of the class conditioned on the data sample as a bernoulli distribution, and using the ratio of the model data distribution and noise distribution to define the logits \cite{Gutmann2010}.
+
+In metric learning, Multidimensional scaling calculates pairwise distances between projected points \cite{cox2000multidimensional}, and for Euclidean distances it is equivalent to PCA \cite{bishop2007} Bishop, which uses dot products in calculating a covariance matrix. 
+Neighborhood Components Analysis learns a low dimensional linear embedding matrix and models a probability of a neighbor by comparing the exponential negative distance to a neighbor to the sum of the exponential negative distances to non-neighbors \cite{conf/nips/GoldbergerRHS04}
+
+Due to slow convergence of Bernoulli contrastive loss and triplet loss, Sohn proposed an exponential dot product probability over multiple examples \cite{Sohn2016ImprovedDM}, which is mathematically consistent with NCE for multiple distributions. The paper’s roots in metric learning motivated the dot product form, with a direct influence from Neighborhood Component Analysis.
+
+More recent contrastive learning research adopted a contrastive loss based off of exponential dot product probabilities, including papers that achieve state of the art semi-supervised learning \cite{wu2018unsupervised;DBLP:journals/corr/abs-2002-05709}.
+
 
 \subsection{Shortcut connections and dynamical systems}
 
