@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{booktabs} % for professional tables
+\usepackage[]{amsmath,amssymb}
 
 % hyperref makes hyperlinks in the resulting PDF.
 % If your build breaks (sometimes temporarily if a hyperlink spans a page)
@@ -49,19 +50,7 @@
 \icmlsetsymbol{equal}{*}
 
 \begin{icmlauthorlist}
-\icmlauthor{Alexander Shim}
-\icmlauthor{Aeiau Zzzz}{equal,to}
-\icmlauthor{Bauiu C.~Yyyy}{equal,to,goo}
-\icmlauthor{Cieua Vvvvv}{goo}
-\icmlauthor{Iaesut Saoeu}{ed}
-\icmlauthor{Fiuea Rrrr}{to}
-\icmlauthor{Tateu H.~Yasehe}{ed,to,goo}
-\icmlauthor{Aaoeu Iasoh}{goo}
-\icmlauthor{Buiui Eueu}{ed}
-\icmlauthor{Aeuia Zzzz}{ed}
-\icmlauthor{Bieea C.~Yyyy}{to,goo}
-\icmlauthor{Teoau Xxxx}{ed}
-\icmlauthor{Eee Pppp}{ed}
+\icmlauthor{Alexander Shim}{}
 \end{icmlauthorlist}
 
 \icmlaffiliation{to}{Department of Computation, University of Torontoland, Torontoland, Canada}
@@ -98,20 +87,18 @@ Gross violations will trigger corrections at the camera-ready phase.
 \section{Introduction}
 \label{introduction}
 
-Transformers have reached state of the art results in language models, significantly outperforming LSTMs. One conceptual explanation for their increased performance is the ability of attention to utilize long range dependencies, whereas Recurrent Neural Networks were limited by having to encode past information within a fixed size hidden state. 
+Transformers have reached state of the art results in language models, significantly outperforming LSTMs. One conceptual explanation for their increased performance is the ability of attention to utilize long range dependencies, whereas Recurrent Neural Networks were limited to encoding past information within a fixed-size hidden state. 
 What this explanation does not explain is how certain architectural choices of transformers, specifically exponential dot product attention, also somewhat ambiguously referred to as softmax attention, outperforms alternatives.
 
-Exponential dot product attention has been seen before in contrastive learning, though often with normalized embeddings before softmax is applied. 
-In language models, the softmax probability was used in Word2Vec and later word embedding work and for memory networks it was used in Neural Turing Machines. 
+Exponential dot product attention has been popularized in contrastive learning and metric learning. 
+In language models, exponential dot product probability were used to model conditional probabilities in Word2Vec as well as in memory network. 
 Contrastive loss originated as Noisy Contrastive Estimation and continues to be used in seminal papers such as SimCLR, which achieved state of the art results, as have many variants based off SimCLR.
 
-The successes of transformers has been verified empirically, but far research
-has focused on a theoretical explanation of transformers perform so well. We
-offer a probabilistic explanation, based off of distributions of the exponential
-family, for attention and contrastive probabilities. Expressing attention as an
-exponential family allows us to utilize related theory in statistics, machine learn-
-ing, and statistical mechanics, offering insightful interpretations in to the trans-
-former architecture.
+The successes of transformers has been verified empirically, but little work
+has focused upon a theoretical framework for transformers. 
+We offer a probabilistic explanation, based off of distributions of the exponential
+family, for attention and contrastive probabilities. 
+Expressing attention as an exponential family allows us to utilize related theory in statistics, machine learning, and statistical mechanics, offering insightful interpretations of the transformer architecture.
 
 We also explicitly state the limitations of our theory, noting that the modern
 Hopfield network interpretation shares many of these limitations. Moreover, for
@@ -119,10 +106,10 @@ some of these limitations, we speculate connections between other areas of re-
 search which may reconcile the theoretical inconsistencies, motivating directions
 for future research.
 
-\section{Related Work}
-\label{related work}
+\section{Background}
+\label{background}
 
-\section{Exponential Dot Product Attention}
+\subsection{Exponential Dot Product Attention}
 Word2vec used a skip-gram model to predict neighboring words using a conditional distribution defined by a normalized exponential dot product multinoulli function \cite{DBLP:journals/corr/MikolovSCCD13}
 
 Attention was proposed through normalized exponential alignment functions, often referred to as softmax attention in literature, for Neural Machine Translation \cite{DBLP:journals/corr/Graves13,bahdanau2014neural}, and later work parallelizing computation on sequential data introduced normalized exponential dot product similarity \cite{DBLP:journals/corr/ParikhT0U16} (A Decomposable Attention Model for Natural Language Inference).
@@ -133,17 +120,17 @@ The transformer architecture incorporated exponential dot product attention scal
 
 \subsection{Contrastive Learning and Metric learning}
 \label{contrastive}
-Noise-Contrastive Estimation creates a mixture distribution between real data and noisy data to convert an unsupervised learning problem into a semi-supervised learning problem, modeling the distribution of the class conditioned on the data sample as a bernoulli distribution, and using the ratio of the model data distribution and noise distribution to define the logits \cite{Gutmann2010}.
+Noise-Contrastive Estimation (NCE) creates a mixture distribution between real data and noisy data to convert an unsupervised learning problem into a semi-supervised learning problem, modeling the distribution of the class conditioned on the data sample as a bernoulli distribution, and using the ratio of the model data distribution and noise distribution to define the logits \cite{Gutmann2010}.
 
-In metric learning, Multidimensional scaling calculates pairwise distances between projected points \cite{cox2000multidimensional}, and for Euclidean distances it is equivalent to PCA \cite{bishop2007} Bishop, which uses dot products in calculating a covariance matrix. 
+In metric learning, Multidimensional scaling calculates pairwise distances between projected points \cite{cox2000multidimensional}, and for Euclidean distances calculating pairwise distances is equivalent to calculating PCA's covariance matrix \cite{bishop2007}, the individual terms of which are calculated by using dot products. 
 Neighborhood Components Analysis learns a low dimensional linear embedding matrix and models a probability of a neighbor by comparing the exponential negative distance to a neighbor to the sum of the exponential negative distances to non-neighbors \cite{conf/nips/GoldbergerRHS04}
 
 Due to slow convergence of Bernoulli contrastive loss and triplet loss, Sohn proposed an exponential dot product probability over multiple examples \cite{Sohn2016ImprovedDM}, which is mathematically consistent with NCE for multiple distributions. The paper’s roots in metric learning motivated the dot product form, with a direct influence from Neighborhood Component Analysis.
 
-More recent contrastive learning research adopted a contrastive loss based off of exponential dot product probabilities, including papers that achieve state of the art semi-supervised learning \cite{wu2018unsupervised;DBLP:journals/corr/abs-2002-05709}.
+More recent contrastive learning research adopted a contrastive loss based off of exponential dot product probabilities, including papers that achieve state of the art semi-supervised learning \cite{wu2018unsupervised,DBLP:journals/corr/abs-2002-05709}.
 
-
-\subsection{Shortcut connections and dynamical systems}
+\subsection{Shortcut Connections and Dynamical Systems}
+\label{residual connections}
 
 Long Short-Term Memory (LSTM)  combined a shortcut connection to deal with the vanishing and exploding gradient problem along with gating functions to incorporate and forget information \cite{HochSchm97}. Residual connections similarly formulated the hidden layer as an update to an identity mapping, though without a gating mechanism \cite{he2015deep}. Recurrent Neural Networks have been interpreted as a discrete time approximation to a continuous dynamical system \cite{article}, where gating acts as a warping of time \cite{tallec2018recurrent}. Residual connections have been interpreted as a discretized update to a differential equation \cite{Weinan2017APO,lu2020finite}.
 
@@ -151,13 +138,90 @@ Interpreting residual networks as discretized differential equations, researcher
 
 In a work most similar to ours, transformers have been interpreted as an update of modern hopfield networks and fixed points have been calculated with respect to a fixed set of patterns \cite{DBLP:journals/corr/abs-2008-02217}.  Our work similarly views the attention sublayer as an operator update over a class of discretized probability distribution, though with a changing set of patterns.
 
-\subsection{Log normalizer and free energy}
+\subsection{Log Normalizer and Free Energy}
+\label{log normalizer}
 
 Partition functions, or the normalizer function, in statistical physics defines a normalization factor of the Hamiltonian with respect to a parameter defining the temperature. The Boltzmann distribution can be derived through Lagrange multipliers as the distribution which maximizes entropy with a conservation of energy constraint. Jaynes adapted the Boltzmann distributions to maximum entropy distributions with multiple expected statistics constraints by converting the maximum entropy problem into the dual problem of optimizing the log normalizer \cite{1456693}, which is known in statistical mechanics as free energy.
 
 Variational methods have been used to approximate log probabilities of observations in machine learning, borrowing from ideas in statistical mechanics. By viewing the joint as an unnormalized probability distribution, the log normalizer is known as the evidence lower-bound, and it has connections to Helmholtz Free Energy \cite{Hinton:1995,koller2009probabilistic}.
 
 The sum of exponents loss of AdaBoost \cite{collins00logistic} has been interpreted as the dual form of generalized KL divergence. The log sum of exponents is well known in convex optimization to be the dual form to the maximum entropy objective for a discrete probability distribution \cite{citeulike:163662}. Notably, in the modern Hopfield network interpretation of transformers as part of the energy function \cite{DBLP:journals/corr/abs-2008-02217}.
+
+\section{Exponential Dot Product Attention}
+\label{exponential dot product attention}
+
+\subsection{Exponential Families}
+\label{exponential families}
+The natural parameter form, also known as the canonical form or a linear exponential family, of a distribution of the exponential family can be written as
+\begin{equation}
+  p(x \vert \eta) = 
+    \frac{1}{Z \left( \eta \right) }
+    h(x)
+    e^{ u(x)^\intercal \eta}
+  \label{exponential family}
+\end{equation}
+where $x$ is the random variable, 
+$u(x)$ the sufficient statistic, 
+$\eta$ the natural parameter, 
+$h(x)$ the intrinsic measure or carrier measure, 
+and 
+$Z ( \eta ) := \int h(x) e^{ u(x)^\intercal \eta }$ the normalizer or partition function.
+An exponential family distribution can be generated from an intrinsic measure $h(x)$ by defining the sufficient statistic $u(x) := x$, and defining the normalizer as the Laplace transform applied to the intrinsic measure:
+\begin{equation}
+  Z ( \eta ) = \mathcal{L} \circ h(x) = \int h(x) e^{ x^\intercal \eta} dx
+  \label{Laplace transform}
+\end{equation}
+The unnormalized probability mass or probability density may be written as $\tilde{p}(x \vert \eta)$.
+
+When $h(x)$ is chosen to be a uniform discrete measure over a finite set of points 
+$\{x_n\}_{n=1}^N $
+in a continuous space, the probability density converts to a probability mass function, and the normalizer is the summation 
+$Z( \eta ) = \sum_{n=1}^N e^{ u(x_n)^\intercal \eta} $
+instead of an integral.
+
+When the query is chosen as the natural parameter and the keys as the finite set of points, exponential dot product attention weights are of the form of an exponential family
+\begin{equation}
+  p( k \vert q ) = 
+  \frac
+    { e^{k \cdot q } }
+    { Z(q) }
+  \label{exponential family attention}
+\end{equation}
+
+The expected sufficient statistic of an exponential family can be written as a one-to-one function of the natural parameter
+\begin{equation}
+  E_{ x \sim P( x \vert \eta) } \left[ u(x) \right] =
+  \nabla_\eta \log Z(\eta)
+  \label{activation function}
+\end{equation}
+For the exponential family defined by attention, we observe that attention averaging is exactly the gradient of the log normalizer
+\begin{equation}
+  \nabla_\eta \log Z(\eta) \vert_{\eta = q} = 
+  \sum_{n=1}^N 
+    \frac
+      { e^{ k_n \cdot q } }
+      { \sum_{n'=1}^N e^{k_{n'} \cdot q} }
+    k_n
+  \label{attention gradient update}
+\end{equation}
+
+When the attention sublayer is added to the residual connection, we observe that we are performing a gradient update of the log normalizer with respect to the natural parameters, which are the hidden states.
+
+The log normalizer for this discrete distribution is the log sum of exponents, which is a component of the modern Hopfield energy function, where the attention sublayer also acts as an update for the hidden states
+\begin{equation}
+  \log Z(q) = \log \sum_{n=1}^N e^{ k_n \cdot q}
+  \label{free energy}
+\end{equation}
+
+\subsection{Expansion and contraction}
+\label{}
+
+The attention sublayer outputs a convex combination of the keys. Without a residual connection, repeated applications of attention would contract the hidden states into the interior, intuitively towards a single fixed point.
+
+With a residual connection, assuming our hidden states are recentered around the origin through layer normalization or some other normalization, we could intuitively imagine that roughly radially symmetric hidden states would push each hidden state further away from the origin.
+Since the log normalizer is the dual form of the maximum entropy distribution, our log normalizer ascent should result in increased entropy, resulting in an expansion of the hidden states away from their starting points.
+
+If we are to hope that our transformer layers would converge to a certain distribution, we would require a compensating contractive operator. In transformers, layer normalization performs this contractive operation, and in contrastive learning, cosine similarity projects points back on to the unit sphere.
 
 \section{Electronic Submission}
 \label{submission}
