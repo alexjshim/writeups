@@ -53,9 +53,7 @@
 \icmlauthor{Alexander Shim}{}
 \end{icmlauthorlist}
 
-\icmlaffiliation{to}{Department of Computation, University of Torontoland, Torontoland, Canada}
-\icmlaffiliation{goo}{Googol ShallowMind, New London, Michigan, USA}
-\icmlaffiliation{ed}{School of Computation, University of Edenborrow, Edenborrow, United Kingdom}
+\icmlaffiliation{}{}
 
 \icmlcorrespondingauthor{Alexander Shim}{alex.shim@gmail.com}
 
@@ -79,9 +77,7 @@
 \printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
 
 \begin{abstract}
-This document provides a basic paper template and submission guidelines.
-Abstracts must be a single paragraph, ideally between 4--6 sentences long.
-Gross violations will trigger corrections at the camera-ready phase.
+We propose a probabilistic interpretation of exponential dot product attention of transformers and contrastive learning based off of exponential families. The attention sublayer of transformers is equivalent to a gradient ascent step of the log normalizer, which is the log-sum-exp term in the Hopfield theory of attention. This ascent step induces a parallel expansion of points, which is counterbalanced by a contraction from layer normalization. We also state theoretical limitations of our theory and the Hopfield theory and suggest directions for resolution.
 \end{abstract}
 
 \section{Introduction}
@@ -148,7 +144,9 @@ Partition functions, or the normalizer function, in statistical physics defines 
 
 Variational methods have been used to approximate log probabilities of observations in machine learning, borrowing from ideas in statistical mechanics. By viewing the joint as an unnormalized probability distribution, the log normalizer is known as the evidence lower-bound, and it has connections to Helmholtz Free Energy \cite{Hinton:1995,koller2009probabilistic}.
 
-The sum of exponents loss of AdaBoost \cite{collins00logistic} has been interpreted as the dual form of generalized KL divergence. The log sum of exponents is well known in convex optimization to be the dual form to the maximum entropy objective for a discrete probability distribution \cite{citeulike:163662}. Notably, in the modern Hopfield network interpretation of transformers as part of the energy function \cite{DBLP:journals/corr/abs-2008-02217}.
+The sum of exponents loss of AdaBoost \cite{collins00logistic} has been interpreted as the dual form of generalized KL divergence. The log sum of exponents is well known in convex optimization to be the dual form to the maximum entropy objective for a discrete probability distribution \cite{citeulike:163662}. Notably, in the modern Hopfield network interpretation of transformers the log sum of exponents is used as part of the energy function and solved through convex optimization techniques \cite{DBLP:journals/corr/abs-2008-02217}.
+
+In the work most similar to ours, McBal suggested an energy-based model interpretation of transformers, with separate energy updates for each attention sublayer and fully-connected layer, and suggested further ideas from statistical physics \cite{bal_2020}.
 
 \section{Exponential Dot Product Attention}
 \label{exponential dot product attention}
@@ -180,7 +178,7 @@ When $h(x)$ is chosen to be a uniform discrete measure over a finite set of poin
 $\{x_n\}_{n=1}^N $
 in a continuous space, the probability density converts to a probability mass function, and the normalizer is the summation 
 $Z( \eta ) = \sum_{n=1}^N e^{ u(x_n)^\intercal \eta} $
-instead of an integral.
+instead of an integral. 
 
 When the query $q_i$ is chosen as the natural parameter and the keys as the finite set of points $\{ k_j \}_{j=1}^N$, exponential dot product attention weights are of the form of an exponential family
 \begin{equation}
