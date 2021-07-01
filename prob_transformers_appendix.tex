@@ -1,0 +1,133 @@
+%%%%%%%% ICML 2021 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2021} with \usepackage[nohyperref]{icml2021} above.
+\usepackage{hyperref}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Use the following line for the initial blind version submitted for review:
+\usepackage{icml2021}
+
+% If accepted, instead use the following line for the camera-ready submission:
+%\usepackage[accepted]{icml2021}
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{A Probabilistic Interpretation of Transformers}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{A Probabilistic Interpretation of Transformers}
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2021
+% package.
+
+% List of affiliations: The first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% You can specify symbols, otherwise they are numbered in order.
+% Ideally, you should not use this facility. Affiliations will be numbered
+% in order of appearance and this is the preferred way.
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Aeiau Zzzz}{equal,to}
+\icmlauthor{Bauiu C.~Yyyy}{equal,to,goo}
+\icmlauthor{Cieua Vvvvv}{goo}
+\icmlauthor{Iaesut Saoeu}{ed}
+\icmlauthor{Fiuea Rrrr}{to}
+\icmlauthor{Tateu H.~Yasehe}{ed,to,goo}
+\icmlauthor{Aaoeu Iasoh}{goo}
+\icmlauthor{Buiui Eueu}{ed}
+\icmlauthor{Aeuia Zzzz}{ed}
+\icmlauthor{Bieea C.~Yyyy}{to,goo}
+\icmlauthor{Teoau Xxxx}{ed}
+\icmlauthor{Eee Pppp}{ed}
+\end{icmlauthorlist}
+
+\icmlaffiliation{to}{Department of Computation, University of Torontoland, Torontoland, Canada}
+\icmlaffiliation{goo}{Googol ShallowMind, New London, Michigan, USA}
+\icmlaffiliation{ed}{School of Computation, University of Edenborrow, Edenborrow, United Kingdom}
+
+\icmlcorrespondingauthor{Cieua Vvvvv}{c.vvvvv@googol.com}
+\icmlcorrespondingauthor{Eee Pppp}{ep@eden.co.uk}
+
+% You may provide any keywords that you
+% find helpful for describing your paper; these are used to populate
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{Machine Learning, ICML}
+
+\vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column
+% listing the affiliations and the copyright notice.
+% The command takes one argument, which is text to display at the start of the footnote.
+% The \icmlEqualContribution command is standard text for equal contribution.
+% Remove it (just {}) if you do not need this facility.
+
+%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\bibliography{example_paper}
+\bibliographystyle{icml2021}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DELETE THIS PART. DO NOT PLACE CONTENT AFTER THE REFERENCES!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{Hopfield Networks is All You Need comparison}
+\label{hniayn}
+
+One key difference is that for the Hopfield theory, the patterns are fixed, while for our theory the patterns are the changing hidden states. Notably later versions of the Hopfield paper added Hopfield layers with changing patterns, but theoretical proofs of the limiting behavior apply for fixed patterns. Arguably, the Hopfield analysis was not meant to answer how the attention sublayers transformed the input, and the focus on exponential storage capacity focused more on the ability of attention to quickly converge from noisy inputs to stored patterns.
+
+Notably, while the encoder and decoder involve attention sublayers which use the hidden states as patterns, fitting our interpretation better, the decoder layers also add a second attention block which apply attention to the encoder input, fitting the Hopfield paper conditions.
+
+From a conceptual perspective, the advantage of the original Hopfield network was that the patterns were stored in the weights. For modern Hopfield networks, the patterns must be stored separately, and they are not directly related to the transformer weights, removing the benefit of biological plausibility. 
+
+The Hopfield theory requires a more specific set of assumptions, which justify the energy function, whereas our theory is based off of information theoretic ideas of a widely used free energy objective, which is dual to maximum entropy. We argue that our theory is more directly responsible for the theoretic interpretation of the Hopfield energy function and gradient updates and it does not rely on motivating factors behind Hopfield networks.
+
+One mutual deficiency for both theories is that they do not explain the transformer attention weight transformations nor does it explain multihead attention. Not having to consider weight transformations, multihead attention, or FC layers makes equilibrium analysis much simpler. Unfortunately, the only parameters in the attention sublayer are in these weight transformations, requiring all knowledge of the data distribution to be encoded into these parameters - otherwise we might expect our language models to perform fairly well without any weights. However, it may be possible that some weights may be less sensitive or at least easier to train than others - linearly transforming the key and query spacies for the attention probabilities may focus on certain subspaces more than others, potentially leading to more efficient convergence, yet perhaps the Hopfield benefit of exponentially fast convergence may still apply regardless. In contrast, the value weights combine with the multihead attention linear transformation and the fully connected layer, leading to a much more nonconvex problem and training instability.
+
+Dot product approximations for exponential dot product attention have been used, and perhaps those works have some connection to the original Hopfield network Ising model interpretation. Recent work \cite{} has further explored the connection between Hopfield networks and Restricted Boltzmann Machines. Perhaps the FC layer or linear attention can be seen as original Hopfield network layers and exponential dot product attention modern Hopfield network layers.
+
+The Hopfield theory seems to attempt continuous integration of states, which requires a quadratic term in the energy to keep the partition function finite. The quadratic term also seems to fulfill another duty of modeling the skip connection. While we perform a discrete normalization, it is reasonable to assume that our set of hidden states are equivalent to hidden states from a continuous distribution. What this distribution is unclear, though it draws parallels to Arora's random walk of language around a context vector, which may be equivalent to McBal's mean-field approximation interpretation of transformers.
+
+
+
+\end{document}
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was created
+% by Iain Murray in 2018, and modified by Alexandre Bouchard in
+% 2019 and 2021. Previous contributors include Dan Roy, Lise Getoor and Tobias
+% Scheffer, which was slightly modified from the 2010 version by
+% Thorsten Joachims & Johannes Fuernkranz, slightly modified from the
+% 2009 version by Kiri Wagstaff and Sam Roweis's 2008 version, which is
+% slightly modified from Prasad Tadepalli's 2007 version which is a
+% lightly changed version of the previous year's version by Andrew
+% Moore, which was in turn edited from those of Kristian Kersting and
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.
