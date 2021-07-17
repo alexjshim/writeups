@@ -7,6 +7,9 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{booktabs} % for professional tables
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
 
 % hyperref makes hyperlinks in the resulting PDF.
 % If your build breaks (sometimes temporarily if a hyperlink spans a page)
@@ -16,6 +19,10 @@
 
 % Attempt to make hyperref and algorithmic work together better:
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
 
 % Use the following line for the initial blind version submitted for review:
 \usepackage{icml2021}
@@ -98,6 +105,102 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
+
+\section{Proofs}
+\label{proofs}
+
+\begin{theorem}
+  Let $X = R^D$, $h: X \rightarrow R^{+}$. 
+  \begin{enumerate}[(a)]
+    \item If $h(x) := \sum_{n=1}^N \delta( x = x_n)$, then 
+    $
+      \nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx 
+      = \sum_{n=1}^N \frac{ e^{ x_n^\intercal \eta } }{ \sum_{n'} e^{ x_{n'}^\intercal \eta } } x_n 
+    $.
+    \item If $h(x) = p_0( x \vert \eta_1, \eta_2)$, where $p_0(x \vert \eta_1,\eta_2)$ is the exponential family distribution $p_0(x \vert \eta_1,\eta_2) = \frac{1}{Z_0(\eta}) h_0(x) e^{x^\intercal \eta} e^{u_2(x)^\intercal \eta_2}$, with sufficient statistic $u_1(x) = x$ and arbitrary sufficient statistic $u_2(x)$, natural parameters $(\eta_1,\eta_2)$, and intrinsic measure $h_0(x)$, and normalizer $Z_0(\eta_1,\eta_2) = \int h_0(x) e^{ x^\intercal \eta_1 } e^{ u_2(x)^\intercal \eta_2 }$, then $\nabla_{_\eta} \log \int h(x) e^{ x^\intercal \eta} = E_{x \sim p_0(x \vert \eta_1 + \eta, \eta_2)} \left[ x \right]$
+    \item
+  \end{enumerate}
+  \label{exponential family gradient updates}
+\end{theorem}
+
+\begin{proof}
+  \begin{enumerate}[(a)]
+    \item $Pr \{ x = x_n \} = \frac{ e^{ x_n^\intercal \eta} }{ \sum_{n'} e^{x_{n'}^\intercal \eta } }$, so $\nabla_\eta \log Z(\eta) = E_{x \sim p( x \vert \eta) } \left[ x \right] = $. \\
+    \item We collect exponential terms into a distribution of the same exponential family as $p_0(x \vert \eta_1,\eta_2)$
+
+  \begin{equation}
+    \begin{split}
+      \int p_0(x) e^{ x^\intercal \eta} dx 
+        &= \frac{1}{Z_0(\eta_1,\eta_2)} \int h_0(x) e^{ x^\intercal ( \eta_1 + \eta_2) } e^{u_2(x)^\intercal \eta_2} dx\\
+      &= \frac{Z_0(\eta_1+\eta,\eta_2)}{Z_0(\eta_1,\eta_2)} \\
+    \end{split}
+    \label{}
+  \end{equation}
+
+  When evaluating the score, the denominator term has no dependence on $\eta$
+
+  \begin{equation}
+    \begin{split}
+      \nabla_\eta \log \int p(x \vert \eta_1,\eta_2) e^{ x^\intercal \eta)} dx
+	&= \nabla_\eta \log \frac{Z_0(\eta_1+\eta),\eta_2}{Z_0(\eta_1,\eta_2)} \\
+      &= \nabla_\eta \log Z_0( \eta_1 + \eta,\eta_2) \\
+      &= E_{ x \sim p( x \vert \eta_1 + \eta, \eta_2)} \left[ x \right]
+    \end{split}
+  \end{equation} 
+  \end{enumerate}
+\end{proof}
+
+\begin{corollary}
+  If $h(x) = \mathcal{N}( x; \mu,\Sigma)$, then $\nabla_\eta \log h(x) e^{ x^\intercal \eta} dx = \mu + \Sigma \eta$.
+\end{corollary}
+
+\begin{proof}
+  The natural parameter form of a Gaussian is $\frac{1}{Z(\eta_1,\eta_2)} e^{ \left< x, \Sigma^{-1} \mu \right> + \left< x x^\intercal, - \frac{\Sigma^{-1}}{2}\right>}$, so $\eta_1 = \Sigma^{-1} \mu$. Conversely, $\mu = \Sigma \eta_1$. \\
+  Hence, $E_{ x \sim p( x \vert \Sigma^{-1} \mu + \eta, - \frac{\Sigma^{-1}}{2}) } \left[ x \right] = \Sigma ( \Sigma^{-1} \mu + \eta ) = \mu + \Sigma \eta$
+\end{proof}
+
+\begin{theorem}
+  If $h(x) = \sum_{n=1}^N \pi_n \mathcal{N}(\mu_n,\Sigma )$, then $\nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx = \Sigma \eta + \sum_{n=1}^N \frac{e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N e^{ \mu_{n'}^\intercal \eta} } \mu_n$
+  \label{rbf update}
+\end{theorem}
+
+\begin{proof}
+  For a Gaussian $\mathcal{N}(x;\mu,\Sigma)$ for $x \in R^d$, the exponential family normalizer is $(2 \pi)^{\frac{D}{2}} \lvert \Sigma \rvert ^{\frac{1}{2}} e^{\frac{1}{2} \mu^\intercal \Sigma^{-1} \mu }$. \\
+  \begin{equation}
+    \begin{split}
+      \int \sum_{n=1}^N \pi_n \mathcal{N}(x;\mu_n,\Sigma) e^{x^\intercal \eta} dx &= \sum_{n=1}^N \frac{1}{Z(\mu_n,\Sigma)} \pi_n \int e^{ \left< x x^\intercal, - \frac{1}{2} \Sigma^{-1} \right> + \left<x, \Sigma^{-1} \mu_n \right> + x^\intercal \eta} dx \\
+      &= \sum_{n=1}^N \frac{Z(\mu_n + \Sigma \eta,\Sigma)}{Z(\mu_n,\Sigma)} \\
+      &= \sum_{n=1}^N e^{\frac{1}{2} (\mu_n + \Sigma \eta)^\intercal \Sigma^{-1} (\mu_n + \Sigma \eta) - \frac{1}{2} \mu_n^\intercal \Sigma^{-1} \mu_n} \\
+      &= e^{\frac{1}{2} \eta^\intercal \Sigma \eta} \sum_{n=1}^N e^{\mu_n^\intercal \eta}
+    \end{split}
+    \label{rbf normalizer}
+  \end{equation}
+
+  where we have factored out the common quadratic term $e^{\frac{1}{2} \eta^\intercal \Sigma \eta}$
+
+  Then the gradient of the log normalizer simplifies to
+
+  \begin{equation}
+    \begin{split}
+      \nabla_\eta \log Z(\eta) = \Sigma \eta + \nabla_\eta \log \sum_{n=1}^N \frac{ e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N e^{\mu_{n'}^\intercal \eta }} \mu_n
+    \end{split}
+    \label{rbf update eq}
+  \end{equation}
+
+  which we note is the discrete attention update plus a $\Sigma \eta$ term.
+\end{proof}
+
+If our intrinsic measure is a mixture of Gaussians with different covariance matrices, then we can perform a gradient update on a lower bound of the log normalizer.
+
+\begin{theorem}
+  If $h(x) = \sum_n \pi_n \mathcal{N} \left( \mu_n, \Sigma_n \right)$, then $\log Z(\eta) \geq \sum_{n=1}^N $
+  \label{}
+\end{theorem}
+
+\begin{proof}
+  Using Jensen's inequality
+\end{proof}
+
 \section{Hopfield Networks is All You Need comparison}
 \label{hniayn}
 
