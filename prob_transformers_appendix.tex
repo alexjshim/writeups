@@ -23,12 +23,13 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
 
 % Use the following line for the initial blind version submitted for review:
-\usepackage{icml2021}
+%\usepackage{icml2021}
 
 % If accepted, instead use the following line for the camera-ready submission:
-%\usepackage[accepted]{icml2021}
+\usepackage[accepted]{icml2021}
 
 % The \icmltitle you define below is probably too long as a header.
 % Therefore, a short form for the running title is supplied here:
@@ -36,7 +37,7 @@
 
 \begin{document}
 
-\twocolumn[
+\onecolumn[
 \icmltitle{A Probabilistic Interpretation of Transformers}
 
 % It is OKAY to include author information, even for blind
@@ -52,29 +53,15 @@
 % You can specify symbols, otherwise they are numbered in order.
 % Ideally, you should not use this facility. Affiliations will be numbered
 % in order of appearance and this is the preferred way.
-\icmlsetsymbol{equal}{*}
+\icmlsetsymbol{}{}
 
 \begin{icmlauthorlist}
-\icmlauthor{Aeiau Zzzz}{equal,to}
-\icmlauthor{Bauiu C.~Yyyy}{equal,to,goo}
-\icmlauthor{Cieua Vvvvv}{goo}
-\icmlauthor{Iaesut Saoeu}{ed}
-\icmlauthor{Fiuea Rrrr}{to}
-\icmlauthor{Tateu H.~Yasehe}{ed,to,goo}
-\icmlauthor{Aaoeu Iasoh}{goo}
-\icmlauthor{Buiui Eueu}{ed}
-\icmlauthor{Aeuia Zzzz}{ed}
-\icmlauthor{Bieea C.~Yyyy}{to,goo}
-\icmlauthor{Teoau Xxxx}{ed}
-\icmlauthor{Eee Pppp}{ed}
+\icmlauthor{Alexander Shim}{ml}
 \end{icmlauthorlist}
 
-\icmlaffiliation{to}{Department of Computation, University of Torontoland, Torontoland, Canada}
-\icmlaffiliation{goo}{Googol ShallowMind, New London, Michigan, USA}
-\icmlaffiliation{ed}{School of Computation, University of Edenborrow, Edenborrow, United Kingdom}
+\icmlaffiliation{ml}{ML Collective}
 
-\icmlcorrespondingauthor{Cieua Vvvvv}{c.vvvvv@googol.com}
-\icmlcorrespondingauthor{Eee Pppp}{ep@eden.co.uk}
+\icmlcorrespondingauthor{Alexander Shim}{alex.shim@gmail.com}
 
 % You may provide any keywords that you
 % find helpful for describing your paper; these are used to populate
@@ -92,8 +79,8 @@
 % The \icmlEqualContribution command is standard text for equal contribution.
 % Remove it (just {}) if you do not need this facility.
 
-%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
-\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+% \printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
 
 \bibliography{example_paper}
 \bibliographystyle{icml2021}
@@ -109,7 +96,7 @@
 \section{Proofs}
 \label{proofs}
 
-\begin{theorem}
+\begin{proposition}
   Let $X = R^D$, $h: X \rightarrow R^{+}$. 
   \begin{enumerate}[(a)]
     \item If $h(x) := \sum_{n=1}^N \delta( x = x_n)$, then 
@@ -117,15 +104,14 @@
       \nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx 
       = \sum_{n=1}^N \frac{ e^{ x_n^\intercal \eta } }{ \sum_{n'} e^{ x_{n'}^\intercal \eta } } x_n 
     $.
-    \item If $h(x) = p_0( x \vert \eta_1, \eta_2)$, where $p_0(x \vert \eta_1,\eta_2)$ is the exponential family distribution $p_0(x \vert \eta_1,\eta_2) = \frac{1}{Z_0(\eta}) h_0(x) e^{x^\intercal \eta} e^{u_2(x)^\intercal \eta_2}$, with sufficient statistic $u_1(x) = x$ and arbitrary sufficient statistic $u_2(x)$, natural parameters $(\eta_1,\eta_2)$, and intrinsic measure $h_0(x)$, and normalizer $Z_0(\eta_1,\eta_2) = \int h_0(x) e^{ x^\intercal \eta_1 } e^{ u_2(x)^\intercal \eta_2 }$, then $\nabla_{_\eta} \log \int h(x) e^{ x^\intercal \eta} = E_{x \sim p_0(x \vert \eta_1 + \eta, \eta_2)} \left[ x \right]$
-    \item
+    \item If $h(x) = p_0( x \vert \eta_1, \eta_2)$, where $p_0(x \vert \eta_1,\eta_2)$ is the exponential family distribution $p_0(x \vert \eta_1,\eta_2) = \frac{1}{Z_0(\eta}) h_0(x) e^{x^\intercal \eta} e^{u_2(x)^\intercal \eta_2}$, with sufficient statistic $u_1(x) = x$ and arbitrary sufficient statistic $u_2(x)$, natural parameters $(\eta_1,\eta_2)$, intrinsic measure $h_0(x)$, and normalizer $Z_0(\eta_1,\eta_2) = \int h_0(x) e^{ x^\intercal \eta_1 } e^{ u_2(x)^\intercal \eta_2 } dx$, then $\nabla_{_\eta} \log \int h(x) e^{ x^\intercal \eta} = E_{x \sim p_0(x \vert \eta_1 + \eta, \eta_2)} \left[ x \right]$
   \end{enumerate}
   \label{exponential family gradient updates}
-\end{theorem}
+\end{proposition}
 
 \begin{proof}
   \begin{enumerate}[(a)]
-    \item $Pr \{ x = x_n \} = \frac{ e^{ x_n^\intercal \eta} }{ \sum_{n'} e^{x_{n'}^\intercal \eta } }$, so $\nabla_\eta \log Z(\eta) = E_{x \sim p( x \vert \eta) } \left[ x \right] = $. \\
+    \item $Pr \{ x = x_n \} = \frac{ e^{ x_n^\intercal \eta} }{ \sum_{n'} e^{x_{n'}^\intercal \eta } }$, so $\nabla_\eta \log Z(\eta) = E_{x \sim p( x \vert \eta) } \left[ x \right] = \sum_n \frac{ e^{x_n^\intercal \eta } }{ \sum_{n'} e^{x_{n'}^\intercal \eta } } x_n $. \\
     \item We collect exponential terms into a distribution of the same exponential family as $p_0(x \vert \eta_1,\eta_2)$
 
   \begin{equation}
@@ -151,54 +137,92 @@
 \end{proof}
 
 \begin{corollary}
-  If $h(x) = \mathcal{N}( x; \mu,\Sigma)$, then $\nabla_\eta \log h(x) e^{ x^\intercal \eta} dx = \mu + \Sigma \eta$.
+  If $h(x) = \mathcal{N}( x; \mu,\Sigma)$, then $\nabla_\eta \log \int h(x) e^{ x^\intercal \eta} dx = \mu + \Sigma \eta$.
+  \label{cor gaussian update}
 \end{corollary}
 
 \begin{proof}
-  The natural parameter form of a Gaussian is $\frac{1}{Z(\eta_1,\eta_2)} e^{ \left< x, \Sigma^{-1} \mu \right> + \left< x x^\intercal, - \frac{\Sigma^{-1}}{2}\right>}$, so $\eta_1 = \Sigma^{-1} \mu$. Conversely, $\mu = \Sigma \eta_1$. \\
-  Hence, $E_{ x \sim p( x \vert \Sigma^{-1} \mu + \eta, - \frac{\Sigma^{-1}}{2}) } \left[ x \right] = \Sigma ( \Sigma^{-1} \mu + \eta ) = \mu + \Sigma \eta$
+  The natural parameter form of a Gaussian is $\frac{1}{Z(\eta_1,\eta_2)} e^{ \left< x, \Sigma^{-1} \mu \right> + \left< x x^\intercal, - \frac{\Sigma^{-1}}{2}\right>}$, where $\left< \, . \, , \, . \, \right>$ denotes the vectorized dot product for both vectors and matrices, with $\eta_1 = \Sigma^{-1} \mu$. Conversely, $\mu = \Sigma \eta_1$. \\
+  Hence, $E_{ x \sim p( x \vert \Sigma^{-1} \mu + \eta, - \frac{\Sigma^{-1}}{2}) } \left[ x \right] = \mu + \Sigma \eta$
 \end{proof}
 
-\begin{theorem}
-  If $h(x) = \sum_{n=1}^N \pi_n \mathcal{N}(\mu_n,\Sigma )$, then $\nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx = \Sigma \eta + \sum_{n=1}^N \frac{e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N e^{ \mu_{n'}^\intercal \eta} } \mu_n$
+\begin{proposition}
+  If $h(x) = \sum_{n=1}^N \pi_n \mathcal{N}(\mu_n,\Sigma )$, where $\pi_n \in R^{+}$, then $\nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx = \Sigma \eta + \sum_{n=1}^N \frac{ \pi_n e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N \pi_{n'} e^{ \mu_{n'}^\intercal \eta} } \mu_n$
   \label{rbf update}
-\end{theorem}
+\end{proposition}
 
 \begin{proof}
   For a Gaussian $\mathcal{N}(x;\mu,\Sigma)$ for $x \in R^d$, the exponential family normalizer is $(2 \pi)^{\frac{D}{2}} \lvert \Sigma \rvert ^{\frac{1}{2}} e^{\frac{1}{2} \mu^\intercal \Sigma^{-1} \mu }$. \\
   \begin{equation}
     \begin{split}
       \int \sum_{n=1}^N \pi_n \mathcal{N}(x;\mu_n,\Sigma) e^{x^\intercal \eta} dx &= \sum_{n=1}^N \frac{1}{Z(\mu_n,\Sigma)} \pi_n \int e^{ \left< x x^\intercal, - \frac{1}{2} \Sigma^{-1} \right> + \left<x, \Sigma^{-1} \mu_n \right> + x^\intercal \eta} dx \\
-      &= \sum_{n=1}^N \frac{Z(\mu_n + \Sigma \eta,\Sigma)}{Z(\mu_n,\Sigma)} \\
-      &= \sum_{n=1}^N e^{\frac{1}{2} (\mu_n + \Sigma \eta)^\intercal \Sigma^{-1} (\mu_n + \Sigma \eta) - \frac{1}{2} \mu_n^\intercal \Sigma^{-1} \mu_n} \\
-      &= e^{\frac{1}{2} \eta^\intercal \Sigma \eta} \sum_{n=1}^N e^{\mu_n^\intercal \eta}
+      &= \sum_{n=1}^N \pi_n \frac{Z(\mu_n + \Sigma \eta,\Sigma)}{Z(\mu_n,\Sigma)} \\
+      &= \sum_{n=1}^N \pi_n e^{\frac{1}{2} (\mu_n + \Sigma \eta)^\intercal \Sigma^{-1} (\mu_n + \Sigma \eta) - \frac{1}{2} \mu_n^\intercal \Sigma^{-1} \mu_n} \\
+      &= e^{\frac{1}{2} \eta^\intercal \Sigma \eta} \sum_{n=1}^N \pi_n e^{\mu_n^\intercal \eta}
     \end{split}
     \label{rbf normalizer}
   \end{equation}
 
-  where we have factored out the common quadratic term $e^{\frac{1}{2} \eta^\intercal \Sigma \eta}$
-
-  Then the gradient of the log normalizer simplifies to
+  The gradient of the log normalizer simplifies to
 
   \begin{equation}
     \begin{split}
-      \nabla_\eta \log Z(\eta) = \Sigma \eta + \nabla_\eta \log \sum_{n=1}^N \frac{ e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N e^{\mu_{n'}^\intercal \eta }} \mu_n
+      \nabla_\eta \log Z(\eta) = \Sigma \eta + \nabla_\eta \log \sum_{n=1}^N \frac{ \pi_n e^{\mu_n^\intercal \eta} }{ \sum_{n'=1}^N \pi_{n'} e^{\mu_{n'}^\intercal \eta }} \mu_n
     \end{split}
     \label{rbf update eq}
   \end{equation}
 
-  which we note is the discrete attention update plus a $\Sigma \eta$ term.
+  which when $\pi_n$ are uniform $\forall n$ is the sum of the discrete attention update and the $\Sigma \eta$ term.
 \end{proof}
 
-If our intrinsic measure is a mixture of Gaussians with different covariance matrices, then we can perform a gradient update on a lower bound of the log normalizer.
+If our intrinsic measure is a mixture of Gaussians with different covariance matrices, then we can perform a gradient update on a lower bound, $G_{LB}(\eta)$, of the log normalizer.
+
+\begin{proposition}
+  If $h(x) = \sum_{n=1}^N \pi_n \mathcal{N} \left( \mu_n, \Sigma_n \right)$, then there exists a lower bound $G_{LB} = \sum_{n=1}^N \pi_n \left( \frac{1}{2} \eta^\intercal \Sigma \eta + \mu_n^\intercal \eta \right) \leq \log Z(\eta)$, with gradient update $\nabla_\eta G_{LB}(\eta) = \sum_{n=1}^N \pi_n ( \mu_n + \Sigma_n \eta )$
+  \label{}
+\end{proposition}
+
+\begin{proof}
+  Using Jensen's inequality on the concave logarithm function,
+
+  \begin{equation}
+    \log \int \sum_{n=1}^N \pi_n \mathcal{N} \left( x; \mu_n, \Sigma_n \right) e^{ x^\intercal \eta} dx \geq \sum_{n=1}^N \pi_n \log \int \mathcal{N} ( x; \mu_n, \Sigma_n ) e^{ x^\intercal \eta} dx
+    \label{Jensen's inequality}
+  \end{equation}
+
+  From \eqref{rbf update eq}, 
+
+  \begin{equation}
+    = \sum_{n=1}^N \pi_n \left( \frac{1}{2} \eta^\intercal \Sigma_n \eta + \mu_n^\intercal \eta \right)
+    \label{lower bound}
+  \end{equation}
+
+  If we perform a gradient update on the lower bound, we have
+  
+  \begin{equation}
+    \nabla_\eta G_{LB}(\eta) = \sum_{n=1}^N \pi_n ( \mu_n + \Sigma_n \eta )
+    \label{lower bound update}
+  \end{equation}
+
+\end{proof}
+
+Using Corollary $\autoref{cor gaussian update}$, we can apply a generalization of the attention sublayer to update a distribution $p(\eta)$ of natural parameters given a Gaussian intrinsic measure, $h(x) = \mathcal{N}(x;\mu,\Sigma)$. Moreover, if we assume there is a one-to-one transformation of the natural parameters into the intrinsic measure through the activation function, we can prove the stationarity of the attention update operator composed with a renormalization:
 
 \begin{theorem}
-  If $h(x) = \sum_n \pi_n \mathcal{N} \left( \mu_n, \Sigma_n \right)$, then $\log Z(\eta) \geq \sum_{n=1}^N $
-  \label{}
+  Suppose the distribution of natural parameters is $p_{eq}(\eta) = \mathcal{N}( \Sigma^{-1} \mu, \Sigma^{-1} )$ and we define the intrinsic measure $h(x)$ by a pointwise transformation $ x = \Sigma \eta$. Let $RN_{\eta_0,\Lambda_0}$ be the renormalization operator such that if $E_{ \eta \sim p(\eta) } \left[ ( \eta, \eta \eta^\intercal ) \right] = (\bar{\eta}, \bar{\Sigma}) $, $RN_{\eta_0,\Lambda_0}$ maps $\eta \rightarrow \eta_0 + \Lambda_0^{\frac{1}{2}}\bar{\Sigma}^{-\frac{1}{2}} (\eta - \bar{\eta})$. 
+  Then the composition of renormalization operator and the attention update operator $RN_{\Sigma^{-1}\mu,\Sigma^{-1}} \circ A \circ ( p_{eq}(\eta), h(x) ) = p_{eq}(\eta)$ . 
+  \label{theorem equilibrium}
 \end{theorem}
 
 \begin{proof}
-  Using Jensen's inequality
+  The attention operator acts pointwise on each $\eta$ by $\eta' = \eta + \nabla_\eta \log \int h(x) e^{x^\intercal \eta} dx$. We can reparametrize $\eta$ as $ \eta = \Sigma^{-1} \mu + \Sigma^{ - \frac{1}{2} } \epsilon$, where $\epsilon \sim \mathcal{N}(0,I)$. Hence $x = \mu + \Sigma^{\frac{1}{2}} \epsilon$, which is the reparametrization of $\mathcal{N}(\mu,\Sigma)$. \\
+  By Corollary $\autoref{cor gaussian update}$,
+  \begin{equation}
+    \eta' = \mu + ( I + \Sigma) \eta
+    \label{gaussian attention update}
+  \end{equation}
+  This is an affine transformation of the natural parameter, and an affine transformation of a gaussian random variable is a gaussian random variable. The renormalization operator is another affine transformation which remaps it to a distribution with mean and covariance of $p_{eq}(\eta)$, and once again it must be a Gaussian distribution.
+
 \end{proof}
 
 \section{Hopfield Networks is All You Need comparison}

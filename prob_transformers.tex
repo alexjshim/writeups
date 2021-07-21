@@ -8,21 +8,29 @@
 \usepackage{subfigure}
 \usepackage{booktabs} % for professional tables
 \usepackage[]{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
 
 % hyperref makes hyperlinks in the resulting PDF.
 % If your build breaks (sometimes temporarily if a hyperlink spans a page)
 % please comment out the following usepackage line and replace
 % \usepackage{icml2021} with \usepackage[nohyperref]{icml2021} above.
+\usepackage[hyphens]{url}
 \usepackage{hyperref}
+\hypersetup{breaklinks=true}
 
 % Attempt to make hyperref and algorithmic work together better:
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+
 % Use the following line for the initial blind version submitted for review:
-\usepackage{icml2021}
+%\usepackage[nohyperref]{icml2021}
 
 % If accepted, instead use the following line for the camera-ready submission:
-%\usepackage[accepted]{icml2021}
+\usepackage[accepted]{icml2021}
 
 % The \icmltitle you define below is probably too long as a header.
 % Therefore, a short form for the running title is supplied here:
@@ -47,13 +55,13 @@
 % You can specify symbols, otherwise they are numbered in order.
 % Ideally, you should not use this facility. Affiliations will be numbered
 % in order of appearance and this is the preferred way.
-\icmlsetsymbol{equal}{*}
+\icmlsetsymbol{}{}
 
 \begin{icmlauthorlist}
-\icmlauthor{Alexander Shim}{}
+\icmlauthor{Alexander Shim}{ml}
 \end{icmlauthorlist}
 
-\icmlaffiliation{}{}
+\icmlaffiliation{ml}{ML Collective}
 
 \icmlcorrespondingauthor{Alexander Shim}{alex.shim@gmail.com}
 
@@ -73,8 +81,8 @@
 % The \icmlEqualContribution command is standard text for equal contribution.
 % Remove it (just {}) if you do not need this facility.
 
-%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
-\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+%\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
 
 \begin{abstract}
 We propose a probabilistic interpretation of exponential dot product attention of transformers and contrastive learning based off of exponential families. The attention sublayer of transformers is equivalent to a gradient ascent step of the log normalizer, which is the log-sum-exp term in the Hopfield theory of attention. This ascent step induces a parallel expansion of points, which is counterbalanced by a contraction from layer normalization. We also state theoretical limitations of our theory and the Hopfield theory and suggest directions for resolution.
@@ -93,7 +101,7 @@ The successes of transformers has been verified empirically, but little work
 has focused upon a theoretical framework for transformers. 
 We offer a probabilistic explanation, based off of distributions of the exponential
 family, for attention and contrastive probabilities. 
-Expressing attention as an exponential family allows us to utilize related theory in statistics, machine learning, and statistical mechanics, offering insightful interpretations of the transformer architecture.
+Expressing attention as an exponential family allows us to utilize related theory in statistics, machine learning, and statistical mechanics, offering insightful interpretations of the transformer architecture. We provide proofs for attention updates over several continuous distributions as well.
 
 We also explicitly state the limitations of our theory, noting that the modern
 Hopfield network interpretation of attention shares many of these limitations. For
@@ -135,7 +143,7 @@ Long Short-Term Memory (LSTM)  combined a shortcut connection to deal with the v
 
 Interpreting residual networks as discretized differential equations, researchers have posed alternative methods for performing forward updates to converge to equilibrium points and backwards updates to the parameters from the equilibrium points \cite{chen2019neural,bai2019deep}. Further work has used monotone operator theory in convex analysis for solving for equilibrium points, interpreting layers as an operator \cite{winston2021monotone}.
 
-In a work most similar to ours, transformers have been interpreted as an update of modern hopfield networks and fixed points have been calculated with respect to a fixed set of patterns \cite{DBLP:journals/corr/abs-2008-02217}.  Our work similarly views the attention sublayer as an operator update over a class of discretized probability distribution, though with a changing set of patterns.
+Mathematically similar to our work, transformers have been interpreted as an update of modern hopfield networks and fixed points have been calculated with respect to a fixed set of patterns \cite{DBLP:journals/corr/abs-2008-02217}.  Our work similarly views the attention sublayer as an operator update over a class of discretized probability distribution, though with a changing set of patterns.
 
 \subsection{Log Normalizer and Free Energy}
 \label{log normalizer}
@@ -146,7 +154,7 @@ Variational methods have been used to approximate log probabilities of observati
 
 The sum of exponents loss of AdaBoost \cite{collins00logistic} has been interpreted as the dual form of generalized KL divergence. The log sum of exponents is well known in convex optimization to be the dual form to the maximum entropy objective for a discrete probability distribution \cite{citeulike:163662}. Notably, in the modern Hopfield network interpretation of transformers the log sum of exponents is used as part of the energy function and solved through convex optimization techniques \cite{DBLP:journals/corr/abs-2008-02217}.
 
-In the work most similar to ours, McBal suggested an energy-based model interpretation of transformers, with separate energy updates for each attention sublayer and fully-connected layer, and suggested further ideas from statistical physics \cite{bal_2020}.
+In the work most similar to ours, McBal suggested an energy-based model interpretation of transformers, with separate energy updates for each attention sublayer and fully-connected layer, as well as additional ideas from statistical physics \cite{bal_2020}.
 
 \section{Exponential Dot Product Attention}
 \label{exponential dot product attention}
@@ -172,7 +180,7 @@ An exponential family distribution can be generated from an intrinsic measure $h
   Z ( \eta ) = \mathcal{L} \circ h(x) = \int h(x) e^{ x^\intercal \eta} dx
   \label{Laplace transform}
 \end{equation}
-The unnormalized probability mass or probability density may be written as $\tilde{p}(x \vert \eta)$.
+% The unnormalized probability mass or probability density may be written as $\tilde{p}(x \vert \eta)$.
 
 When $h(x)$ is chosen to be a uniform discrete measure over a finite set of points 
 $\{x_n\}_{n=1}^N $
@@ -196,15 +204,37 @@ The expected sufficient statistic of an exponential family can be written as a o
   \label{activation function}
 \end{equation}
 For the exponential family defined by attention, we observe that attention averaging is exactly the gradient of the log normalizer
-\begin{equation}
-  \nabla_\eta \log Z(\eta) \vert_{\eta = q_i} = 
-  \sum_{j=1}^N 
-    \frac
-      { e^{ k_j \cdot q } }
-      { \sum_{n'=1}^N e^{k_{n'} \cdot q_i} }
-    k_j
-  \label{attention gradient update}
-\end{equation}
+% \begin{equation}
+%  \nabla_\eta \log Z(\eta) \vert_{\eta = q_i} = 
+%  \sum_{j=1}^N 
+%    \frac
+%      { e^{ k_j \cdot q } }
+%      { \sum_{n'=1}^N e^{k_{n'} \cdot q_i} }
+%    k_j
+%  \label{attention gradient update}
+% \end{equation}
+
+We further prove results for attention updates of non-discrete $h(x)$. Proofs and further results are given in the appendix.
+
+\begin{proposition}
+  Let $X = R^D$, $h: X \rightarrow R^{+}$. 
+  \begin{enumerate}[(a)]
+    \item If $h(x) := \sum_{n=1}^N \delta( x = x_n)$, then \\
+    $
+      \nabla_\eta \log \int h(x) e^{ x^\intercal \eta } dx 
+      = \sum_{n=1}^N \frac{ e^{ x_n^\intercal \eta } }{ \sum_{n'} e^{ x_{n'}^\intercal \eta } } x_n 
+    $.
+    \item If $h(x) = p_0( x \vert \eta_1, \eta_2)$, where $p_0(x \vert \eta_1,\eta_2)$ is the exponential family distribution $p_0(x \vert \eta_1,\eta_2) = \frac{1}{Z_0(\eta}) h_0(x) e^{x^\intercal \eta} e^{u_2(x)^\intercal \eta_2}$, with sufficient statistic $u_1(x) = x$ and arbitrary sufficient statistic $u_2(x)$, natural parameters $(\eta_1,\eta_2)$, intrinsic measure $h_0(x)$, and normalizer $Z_0(\eta_1,\eta_2) = \int h_0(x) e^{ x^\intercal \eta_1 } e^{ u_2(x)^\intercal \eta_2 } dx$, then $\nabla_{_\eta} \log \int h(x) e^{ x^\intercal \eta} = E_{x \sim p_0(x \vert \eta_1 + \eta, \eta_2)} \left[ x \right]$
+  \end{enumerate}
+  \label{exponential family gradient updates}
+\end{proposition}
+
+\begin{corollary}
+  If $h(x) = \mathcal{N}( x; \mu,\Sigma)$, then \\
+  $\nabla_\eta \log \int h(x) e^{ x^\intercal \eta} dx = \mu + \Sigma \eta$.
+  \label{cor gaussian update}
+\end{corollary}
+
 
 When the attention sublayer is added to the residual connection, we observe that we are performing a gradient update of the log normalizer with respect to the natural parameters, which are the hidden states.
 
@@ -214,33 +244,58 @@ The log normalizer for this discrete distribution is the log sum of exponents, w
   \label{free energy}
 \end{equation}
 
-\subsection{Expansion and contraction}
-\label{}
 
-The attention sublayer outputs a convex combination of the keys. Without a residual connection, repeated applications of attention would contract the hidden states into the interior, intuitively towards a single fixed point.
+
+
+\subsection{Log normalizer of exponential families}
+
+The set of queries can be seen as IID samples from a distribution of natural parameters \footnote{McBal refers to attention as a mean-field approximation}, meaning our gradient operator is updating a distribution of distributions. In information geometry, natural parameters are naturally mapped to their exponential family distributions, specifically when the Bregman divergence $B_G(\eta_1,\eta_2)$ is defined by the log normalizer $G(\eta) = \log Z(\eta)$, equaling $KL \left( p(x \vert \eta_1) \Vert p(x \vert \eta_2) \right)$. 
+
+The Bregman divergence of the convex conjugate of the log normalizer is also equivalent to KL divergence, and the dual variable is exactly the expected sufficient statistic $\bar{u}$, relating back to the activation function \eqref{activation function}.
+
+\begin{equation}
+  \begin{split}
+    G^*(\eta^*) = \sup_\eta \left( \eta^\intercal \eta^* - G(\eta) \right)\\
+    \eta^* = \bar{u} = \nabla_\eta \log Z(\eta)
+  \end{split}
+  \label{Fenchel duality}
+\end{equation}
+
+$G^*( \bar{u} ) = -H( p( x \vert \bar{u} ) - E_{ x \sim p( x \vert \bar{u} ) } \left[ \log h(x) \right]$ is an offset of the negative entropy function acting on the exponential family distribution with expected sufficient statistic $\bar{u}$, meaning the dual problem of attention is a variant of the maximum entropy problem.
+More importantly, the duality between natural parameters and expected sufficient statistics can be used to transform a distribution of natural parameters, that is, our query space, into a distribution of expected sufficient statistics, that is, our key space, through our activation function. Unfortunately, the activation function is not always an affine function, but if we attempt an affine approximation, we recover $\nabla^2 \log Z(\eta) = E_{ x \sim p(x)} \left[ u(x) u(x)^\intercal \right]$, the Fisher information matrix.
+
+When our hidden states is our natural parameter distribution, our affine approximation for the key corresponding to $h_j$ is $\Sigma^{-1} h_j$, exponential dot product attention is proportional to $ e^{h_i^T \Sigma^{-1} h_j} $, suggesting our key and query weights $W_q^\intercal W_k \approx \Sigma^{-1}$.
+
+\subsection{Expansion and contraction}
+\label{expansion and contraction}
+
+The attention sublayer outputs a convex combination of the keys, $\sum_{n=1}^N A(k_n,q) k_n$. Without a residual connection, repeated applications of attention would contract the hidden states into the interior, intuitively risking a collapse to a single fixed point.
 
 With a residual connection, assuming our hidden states are recentered around the origin through layer normalization or some other normalization, we could intuitively imagine that roughly radially symmetric hidden states would push each hidden state further away from the origin.
 Since the log normalizer is the dual form of the maximum entropy distribution, our log normalizer ascent should result in increased entropy, resulting in an expansion of the hidden states away from their starting points.
 
-If we are to hope that our transformer layers would converge to a certain distribution, we would require a compensating contractive operator. In transformers, layer normalization performs this contractive operation, and in contrastive learning, cosine similarity projects points back on to the unit sphere.
+We prove that at equilibrium this result holds for uncentered Gaussian distributions. The more formal statement and proof are given in the appendix.
+
+\begin{theorem}
+  (Informal) $p_{eq}(\eta) = \mathcal{N}( \Sigma^{-1} \mu, \Sigma^{-1} )$ is an equilibrium distribution of the renormalization operator $RN$ with mean $\Sigma^{-1} \mu$ and covariance $\Sigma^{-1}$,  composed with the attention update operator, assuming intrinsic measure $h(x): \eta \rightarrow \Sigma \eta$.
+  \label{informal theorem equilibrium}
+\end{theorem}
 
 \section{Operator Interpretation}
 \label{operator interpretation}
 
 Starting with a hidden state of $N$ tokens, our attention heads are simultaneous gradient updates on each token. 
-We can interpret the tokens as a discretization of a distribution, drawing parallels to the empirical distribution defined by sampling. 
-Since we can use a Laplace transform to induce an exponential family from the discrete distribution, we can view the attention sublayer as an operator mapping a distribution of hidden states to a new distribution of hidden states.
-
+We can interpret the tokens as a discretization of a distribution, drawing parallels to the empirical distribution defined by sampling, with the attention operator acting as a pointwise gradient update of the distribution of natural parameters.
 Two interesting cases of deriving an exponential family from an intrinsic measure are when a conjugate prior $ p( \eta \vert \xi, \nu )$ is defined as the intrinsic measure, and in boosting where the previous model defines an intrinsic measure of unnormalized weights by $w_i = e^{ - t_i \eta_n(x_i) } $, where $\eta_n$ is the previous iteration of the model logits \cite{collins00logistic}.
 
 The FC layer can be viewed as a discrete approximation to an operator as well, so the entire attention block can be viewed as a distributional operator.  If different attention blocks have tied weights, then it is the same operator applied repeatedly, otherwise the operators for each layer change.
 
 \section{Theoretical Limitations}
 \label{limitations}
-Both this work and the Hopfield interpretation of transformers ignore the weight matrices, which are the only parameters that the network learns for the attention sublayer. 
+Both this work and the Hopfield interpretation of transformers initially ignore the weight matrices, which are the only parameters that the network learns for the attention sublayer. 
 With transformer models having hundreds of millions to a billion parameters and being difficult to train, this oversight is deeply problematic. 
 The simplest interpretation is for the weight matrices to represent different distortions of space, in which case different attention heads would represent different distortions.
-Unfortunately, this makes multihead attention incoherent, as we would be combining gradient updates from different spatial transformations.
+Unfortunately, this makes multihead attention incoherent, as we would be combining gradient updates from different spatial transformations. We present a somewhat more consistent lower bound approximation of the log normalizer of a mixture of Gaussians in the appendix.
 
 For this work, we have interpreted a single update on a single hidden state as a gradient update. 
 However, it is less clear why each hidden state has a separate gradient update, and since they depend on the other hidden states, they are not independent updates. The Ising model, which motivated the original Hopfield network, has similar properties. Sample-based approximate inference techniques for Sequential Monte Carlo, particularly ones utilizing bootstrapping, are dependent on the samples and qualitatively similarly use $N$ samples to generate $N$ new samples for the next time step.
@@ -249,20 +304,17 @@ The FC layer is inconsistent with both the Hopfield theory of attention and this
 
 \section{Future Work}
 \label{future work}
-Viewing the attention sublayer as an operator, a natural question is what would the equilbrium distribution of the operator be. 
-The Hopfield theory of transformers solved this, but specifically when the patterns were fixed, whereas for transformers the patterns are the dynamically changing hidden states.
+The Hopfield theory of transformers solved for equilibrium behavior, but specifically when the patterns were fixed, whereas for transformers the patterns are the dynamically changing hidden states.
 A useful experiment would be to sample from an initial distribution and observe how distributions change with each layer, especially with learned weights.
-
 
 Since the theoretical interpretations ignore the FC layer, it would be useful to know how close the FC layer is to an identity mapping or a purely linear layer, if at all.
 
-
 Assuming layer normalization should induce an equilibrium distribution of a Gaussian distribution, we could potentially try other contractive mappings to see if this generates substantially different embeddings and layer behavior.
 
-One key difference in theories is that in this work, the residual connection is used as an initial point for a gradient update, whereas the Hopfield theory of attention defines a quadratic term in the Hopfield energy, strongly suggesting that we are working with Gaussian distributions. Since exponential dot product probabilities may come from Euclidean assumptions in metric learning, attention may be making an inherent assumption about marginalization over Gaussian distributions.
+One key difference in theories is that in this work, the residual connection is used as an initial point for a gradient update, whereas the Hopfield theory of attention defines a quadratic term in the Hopfield energy, strongly suggesting that we are working with Gaussian distributions. 
+Since exponential dot product probabilities may come from locally Euclidean assumptions in metric learning, weighted attention may be making inherent assumptions about Gaussian distributions or mixtures of Gaussians over the key space.
 
-In comparison, other exponential families will not map the natural parameter to the expected sufficient statistic as cleanly as with Gaussian distributions. In those cases, we would need to apply a non-linear activation or a link function to transform the sufficient statistic space to the natural parameter space before we take the dot product. An affine approximation of the activation function is the Fisher information matrix, so we could test to see if the query and key weight matrices combine to an approximation of the Fisher information matrix.
-
+Non-Gaussian exponential families will not map the natural parameter to the expected sufficient statistic through an affine transformation. In those cases, we would need to apply a non-linear activation function to transform the natural parameter space into the sufficient statistic space before we take the dot product. An affine approximation of the activation function is the Fisher information matrix, so we could test to see if the query and key weight matrices combine to an approximation of the Fisher information matrix.
 
 \bibliography{prob_transformers}
 \bibliographystyle{icml2021}
